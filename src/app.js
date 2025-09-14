@@ -11,9 +11,7 @@ var usersRouter = require('./routes/users.route');
 
 var app = express();
 
-// 视图引擎设置
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
+// 视图引擎设置已移除，项目改为纯API服务
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -33,13 +31,12 @@ app.use(function (req, res, next) {
 
 // 错误处理器
 app.use(function (err, req, res, next) {
-    // 设置本地变量，仅在开发环境中提供错误信息
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-    // 渲染错误页面
-    res.status(err.status || 500);
-    res.render('error');
+    // 返回JSON格式的错误信息
+    res.status(err.status || 500).json({
+        success: false,
+        message: err.message || '服务器内部错误',
+        error: req.app.get('env') === 'development' ? err.stack : undefined
+    });
 });
 
 module.exports = app;

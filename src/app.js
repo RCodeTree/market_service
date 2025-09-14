@@ -13,11 +13,11 @@ app.set('view engine', 'pug');
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(usersRouter)
+app.use(usersRouter);
 
 // 捕获 404 错误并转发到错误处理器
 app.use(function (req, res, next) {

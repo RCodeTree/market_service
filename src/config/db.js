@@ -6,12 +6,10 @@ const DM8 = require('dmdb'); // 导入达梦数据库模块
 */
 const GetPool = async () => {
     try {
-        const connectStr = "dm://SYSDBA:SYSDBA@localhost:5236?autoCommit=false&loginEncrypt=false";
+        const connectStr = "dm://SYSDBA:SYSDBA@localhost:5236?autoCommit=false&loginEncrypt=false&password=WKRwks20041104.";
         // 创建数据库连接池
         return await DM8.createPool({
             connectString: connectStr,
-            user: 'SYSDBA',
-            password: 'WKRwks20041104.',
             poolMax: 10, // 设置数据库连接池的最大连接数
             poolMin: 1, // 设置数据库连接池的最小连接数
             poolTimeout: 1000, // 设置数据库连接池的连接超时时间
@@ -26,7 +24,6 @@ const GetDatabase = async () => {
     try {
         const pool = await GetPool();
         const conn = await pool.getConnection(); // 获取数据库连接
-        console.log('数据库连接成功');
         return {pool, conn};
     } catch (error) {
         throw new Error(`创建数据库连接出现异常: ${error.message}`)

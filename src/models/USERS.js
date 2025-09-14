@@ -44,7 +44,6 @@ class USERS {
         conn = Conn;
 
         try {
-            console.log(conn)
             const result = await conn.execute("select * from MARKET.USERS");
             console.log('获取用户列表成功:', result.rows);
             return result.rows;

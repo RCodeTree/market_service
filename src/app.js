@@ -3,6 +3,10 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+
+/*
+    引入路由
+*/
 var usersRouter = require('./routes/users.route');
 
 var app = express();
@@ -17,6 +21,9 @@ app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+/*
+    注册路由
+*/
 app.use(usersRouter);
 
 // 捕获 404 错误并转发到错误处理器

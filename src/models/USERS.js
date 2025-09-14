@@ -1,4 +1,4 @@
-const { Database } = require('../config/db'); // 导入自定义的达梦数据库模块
+const {GetDatabase: database} = require('../config/db'); // 导入自定义的达梦数据库模块
 
 class USERS {
     user_id;
@@ -38,8 +38,14 @@ class USERS {
 
     // 获取所有用户
     static async getAllUsers() {
+        let pool, conn;
+        const {pool: Pool, conn: Conn} = await database();
+        pool = Pool;
+        conn = Conn;
+
         try {
-            const result = await Database.conn.execute("select * from MARKET.USERS");
+            const result = await conn.execute("select * from MARKET.USERS");
+            console.log('获取用户列表成功:', result.rows);
             return result.rows;
         } catch (error) {
             console.error('获取用户列表失败:', error.message);
@@ -48,6 +54,7 @@ class USERS {
             await conn.close();
             await pool.close();
         }
+
     }
 
 }

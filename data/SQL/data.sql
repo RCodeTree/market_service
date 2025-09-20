@@ -2,7 +2,7 @@
 set schema MARKET;
 
 -- create user table
-create table USERS
+create table UsersModel
 (
     user_id  NUMBER(6) primary key,
     username VARCHAR2(30),
@@ -10,15 +10,15 @@ create table USERS
 );
 
 -- add data into user table
-insert into MARKET.USERS
+insert into MARKET.UsersModel
 values (12, 'user1', 18);
-insert into MARKET.USERS
+insert into MARKET.UsersModel
 values (2, 'user2', 19);
-insert into MARKET.USERS
+insert into MARKET.UsersModel
 values (3, 'user3', 20);
 
 -- query user table
-select * from MARKET.USERS;
+select * from MARKET.UsersModel;
 
 -- clean user table
-delete from MARKET.USERS;
+delete from MARKET.UsersModel;

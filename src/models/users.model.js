@@ -1,6 +1,6 @@
 const {GetDatabase: database} = require('../config/db'); // 导入自定义的达梦数据库模块
 
-class USERS {
+class UsersModel {
     user_id;
     username;
     age;
@@ -44,7 +44,7 @@ class USERS {
         conn = Conn;
 
         try {
-            const result = await conn.execute("select * from MARKET.USERS");
+            const result = await conn.execute("select * from MARKET.UsersModel");
             console.log('获取用户列表成功:', result.rows);
             return result.rows;
         } catch (error) {
@@ -59,4 +59,4 @@ class USERS {
 
 }
 
-module.exports = USERS;
+module.exports = UsersModel;

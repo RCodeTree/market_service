@@ -7,7 +7,7 @@ var logger = require('morgan');
 /*
     引入路由
 */
-var usersRouter = require('./routes/users.route');
+
 
 var app = express();
 
@@ -22,7 +22,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 /*
     注册路由
 */
-app.use(usersRouter);
+
 
 // 捕获 404 错误并转发到错误处理器
 app.use(function (req, res, next) {

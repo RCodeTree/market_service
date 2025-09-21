@@ -6,17 +6,17 @@ set schema MARKET;
 -- 1. 用户相关表
 -- ================================
 
--- 用户表
+-- 用户表（简化注册：只需用户名和密码）
 CREATE TABLE users (
     id BIGINT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE COMMENT '用户名',
-    email VARCHAR(100) NOT NULL UNIQUE COMMENT '邮箱',
-    phone VARCHAR(20) UNIQUE COMMENT '手机号',
+    email VARCHAR(100) UNIQUE COMMENT '邮箱（可选）',
+    phone VARCHAR(20) UNIQUE COMMENT '手机号（可选）',
     password_hash VARCHAR(255) NOT NULL COMMENT '密码哈希',
-    nickname VARCHAR(50) COMMENT '昵称',
-    avatar VARCHAR(500) COMMENT '头像URL',
+    nickname VARCHAR(50) COMMENT '昵称（可选）',
+    avatar VARCHAR(500) COMMENT '头像URL（可选）',
     gender TINYINT DEFAULT 0 COMMENT '性别：0-未知，1-男，2-女',
-    birthday DATE COMMENT '生日',
+    birthday DATE COMMENT '生日（可选）',
     status TINYINT DEFAULT 1 COMMENT '状态：0-禁用，1-正常',
     last_login_time TIMESTAMP COMMENT '最后登录时间',
     last_login_ip VARCHAR(45) COMMENT '最后登录IP',

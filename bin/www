@@ -87,4 +87,7 @@ function onListening() {
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
+  console.log('🚀 Market Service 服务器启动成功！');
+  console.log('📍 服务地址: http://localhost:' + addr.port);
+  console.log('📚 API文档: http://localhost:' + addr.port + '/api');
 }

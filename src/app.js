@@ -7,11 +7,24 @@ var logger = require('morgan');
 /*
     引入路由
 */
-
+var usersRouter = require('./routes/users.route');
 
 var app = express();
 
 // 视图引擎设置已移除，项目改为纯API服务
+
+// CORS中间件
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+
+    if (req.method === 'OPTIONS') {
+        res.sendStatus(200);
+    } else {
+        next();
+    }
+});
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -19,9 +32,13 @@ app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// 设置信任代理，用于获取真实IP
+app.set('trust proxy', true);
+
 /*
     注册路由
 */
+app.use('/api', usersRouter);
 
 
 // 捕获 404 错误并转发到错误处理器

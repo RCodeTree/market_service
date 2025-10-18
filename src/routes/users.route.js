@@ -33,6 +33,7 @@ router.post('/auth/login', UserController.login);
  */
 router.get('/auth/check-username/:username', UserController.checkUsername);
 
+
 /**
  * 用户登出
  * POST /api/auth/logout

@@ -131,6 +131,25 @@ class UserService {
                 throw new Error('账户已被禁用');
             }
 
+            // 检查密码哈希是否存在
+            if (!user.password_hash) {
+                console.error('用户密码哈希为空:', {
+                    userId: user.id,
+                    username: user.username,
+                    passwordHash: user.password_hash
+                });
+
+                await this.logLoginAttempt({
+                    user_id: user.id,
+                    login_ip: clientIp,
+                    user_agent: userAgent,
+                    is_success: false,
+                    fail_reason: '用户数据异常'
+                });
+
+                throw new Error('用户数据异常，请联系管理员');
+            }
+
             // 验证密码
             const isPasswordValid = await bcrypt.compare(password, user.password_hash);
             if (!isPasswordValid) {

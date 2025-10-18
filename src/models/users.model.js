@@ -41,7 +41,7 @@ class UserModel {
                        agree_privacy,
                        created_at,
                        updated_at
-                FROM users
+                FROM MARKET.USERS
                 WHERE username = ?
                   AND status != 0
             `;
@@ -95,7 +95,7 @@ class UserModel {
                        phone_verified,
                        created_at,
                        updated_at
-                FROM users
+                FROM MARKET.USERS
                 WHERE id = ?
                   AND status != 0
             `;
@@ -132,7 +132,7 @@ class UserModel {
             const userId = Date.now() + Math.floor(Math.random() * 1000);
 
             const sql = `
-                INSERT INTO users (id, username, password_hash, nickname, email, phone,
+                INSERT INTO MARKET.USERS (id, username, password_hash, nickname, email, phone,
                                    agree_terms, agree_privacy, created_at, updated_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
             `;
@@ -184,7 +184,7 @@ class UserModel {
             conn = connection;
 
             const sql = `
-                UPDATE users
+                UPDATE MARKET.USERS
                 SET last_login_time = CURRENT_TIMESTAMP,
                     last_login_ip   = ?,
                     login_count     = login_count + 1,
@@ -226,7 +226,7 @@ class UserModel {
             const logId = Date.now() + Math.floor(Math.random() * 1000);
 
             const sql = `
-                INSERT INTO user_login_logs (id, user_id, login_ip, user_agent, device, location,
+                INSERT INTO MARKET.USER_LOGIN_LOGS (id, user_id, login_ip, user_agent, device, location,
                                              is_success, fail_reason, created_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
             `;
@@ -286,7 +286,7 @@ class UserModel {
             updateFields.push('updated_at = CURRENT_TIMESTAMP');
             updateValues.push(userId);
 
-            const sql = `UPDATE users
+            const sql = `UPDATE MARKET.USERS
                          SET ${updateFields.join(', ')}
                          WHERE id = ?`;
 
@@ -318,7 +318,7 @@ class UserModel {
             const {conn: connection} = await GetDatabase();
             conn = connection;
 
-            const sql = 'SELECT COUNT(*) as count FROM users WHERE username = ?';
+            const sql = 'SELECT COUNT(*) as count FROM MARKET.USERS WHERE username = ?';
             const result = await conn.execute(sql, [username]);
 
             return result.rows[0].COUNT > 0;
@@ -340,6 +340,45 @@ class UserModel {
     static formatUserData(rawData) {
         if (!rawData) return null;
 
+        // 处理达梦数据库返回的数组格式数据
+        if (Array.isArray(rawData)) {
+            // 根据findByUsername查询的字段顺序映射
+            const [
+                id, username, password_hash, nickname, email, phone, avatar, gender, 
+                birthday, bio, level, points, balance, status, last_login_time, 
+                last_login_ip, login_count, remember_token, email_verified, 
+                phone_verified, agree_terms, agree_privacy, created_at, updated_at
+            ] = rawData;
+            
+            return {
+                id,
+                username,
+                password_hash,
+                nickname,
+                email,
+                phone,
+                avatar,
+                gender,
+                birthday,
+                bio,
+                level,
+                points,
+                balance,
+                status,
+                last_login_time,
+                last_login_ip,
+                login_count,
+                remember_token,
+                email_verified,
+                phone_verified,
+                agree_terms,
+                agree_privacy,
+                created_at,
+                updated_at
+            };
+        }
+
+        // 处理对象格式数据（兼容性保留）
         return {
             id: rawData.ID,
             username: rawData.USERNAME,

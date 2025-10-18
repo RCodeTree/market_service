@@ -13,7 +13,7 @@ SET SCHEMA MARKET;
 -- ================================
 
 -- 用户表（简化注册：仅需用户名和密码）
-CREATE TABLE users
+CREATE TABLE USERS
 (
     id              BIGINT PRIMARY KEY,
     username        VARCHAR(50)  NOT NULL UNIQUE COMMENT '用户名（唯一标识）',
@@ -42,7 +42,7 @@ CREATE TABLE users
 );
 
 -- 用户登录记录表（记录登录历史）
-CREATE TABLE user_login_logs
+CREATE TABLE USER_LOGIN_LOGS
 (
     id         BIGINT PRIMARY KEY,
     user_id    BIGINT      NOT NULL COMMENT '用户ID（逻辑外键）',
@@ -56,7 +56,7 @@ CREATE TABLE user_login_logs
 );
 
 -- 密码重置表（忘记密码功能）
-CREATE TABLE password_resets
+CREATE TABLE PASSWORD_RESETS
 (
     id         BIGINT PRIMARY KEY,
     user_id    BIGINT       NOT NULL COMMENT '用户ID（逻辑外键）',
@@ -69,7 +69,7 @@ CREATE TABLE password_resets
 );
 
 -- 用户地址表
-CREATE TABLE user_addresses
+CREATE TABLE USER_ADDRESSES
 (
     id             BIGINT PRIMARY KEY,
     user_id        BIGINT       NOT NULL COMMENT '用户ID（逻辑外键）',
@@ -88,7 +88,7 @@ CREATE TABLE user_addresses
 );
 
 -- 用户收藏表
-CREATE TABLE user_favorites
+CREATE TABLE USER_FAVORITES
 (
     id         BIGINT PRIMARY KEY,
     user_id    BIGINT NOT NULL COMMENT '用户ID（逻辑外键）',
@@ -97,7 +97,7 @@ CREATE TABLE user_favorites
 );
 
 -- 用户搜索历史表
-CREATE TABLE user_search_history
+CREATE TABLE USER_SEARCH_HISTORY
 (
     id           BIGINT PRIMARY KEY,
     user_id      BIGINT COMMENT '用户ID（逻辑外键），NULL表示游客',
@@ -112,7 +112,7 @@ CREATE TABLE user_search_history
 -- ================================
 
 -- 商品分类表（支持多级分类）
-CREATE TABLE categories
+CREATE TABLE CATEGORIES
 (
     id              BIGINT PRIMARY KEY,
     name            VARCHAR(100) NOT NULL COMMENT '分类名称',
@@ -135,7 +135,7 @@ CREATE TABLE categories
 );
 
 -- 品牌表
-CREATE TABLE brands
+CREATE TABLE BRANDS
 (
     id           BIGINT PRIMARY KEY,
     name         VARCHAR(100) NOT NULL COMMENT '品牌名称',
@@ -154,7 +154,7 @@ CREATE TABLE brands
 );
 
 -- 商品表
-CREATE TABLE products
+CREATE TABLE PRODUCTS
 (
     id                   BIGINT PRIMARY KEY,
     name                 VARCHAR(200)   NOT NULL COMMENT '商品名称',
@@ -197,7 +197,7 @@ CREATE TABLE products
 );
 
 -- 商品图片表
-CREATE TABLE product_images
+CREATE TABLE PRODUCT_IMAGES
 (
     id         BIGINT PRIMARY KEY,
     product_id BIGINT       NOT NULL COMMENT '商品ID（逻辑外键）',
@@ -210,7 +210,7 @@ CREATE TABLE product_images
 );
 
 -- 商品规格表（SKU）
-CREATE TABLE product_skus
+CREATE TABLE PRODUCT_SKUS
 (
     id             BIGINT PRIMARY KEY,
     product_id     BIGINT         NOT NULL COMMENT '商品ID（逻辑外键）',
@@ -228,8 +228,8 @@ CREATE TABLE product_skus
     updated_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间'
 );
 
--- 商品规格名表
-CREATE TABLE product_spec_names
+-- 商品规格名称表
+CREATE TABLE PRODUCT_SPEC_NAMES
 (
     id         BIGINT PRIMARY KEY,
     product_id BIGINT      NOT NULL COMMENT '商品ID（逻辑外键）',
@@ -239,7 +239,7 @@ CREATE TABLE product_spec_names
 );
 
 -- 商品规格值表
-CREATE TABLE product_spec_values
+CREATE TABLE PRODUCT_SPEC_VALUES
 (
     id           BIGINT PRIMARY KEY,
     spec_name_id BIGINT       NOT NULL COMMENT '规格名ID（逻辑外键）',
@@ -254,7 +254,7 @@ CREATE TABLE product_spec_values
 -- ================================
 
 -- 购物车表
-CREATE TABLE cart_items
+CREATE TABLE CART_ITEMS
 (
     id         BIGINT PRIMARY KEY,
     user_id    BIGINT         NOT NULL COMMENT '用户ID（逻辑外键）',
@@ -272,7 +272,7 @@ CREATE TABLE cart_items
 -- ================================
 
 -- 订单表
-CREATE TABLE orders
+CREATE TABLE ORDERS
 (
     id                   BIGINT PRIMARY KEY,
     order_no             VARCHAR(50)    NOT NULL UNIQUE COMMENT '订单号',
@@ -315,7 +315,7 @@ CREATE TABLE orders
 );
 
 -- 订单商品表
-CREATE TABLE order_items
+CREATE TABLE ORDER_ITEMS
 (
     id              BIGINT PRIMARY KEY,
     order_id        BIGINT         NOT NULL COMMENT '订单ID（逻辑外键）',
@@ -335,8 +335,8 @@ CREATE TABLE order_items
     created_at      TIMESTAMP      DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'
 );
 
--- 订单状态变更记录表
-CREATE TABLE order_status_logs
+-- 订单状态变更日志表
+CREATE TABLE ORDER_STATUS_LOGS
 (
     id            BIGINT PRIMARY KEY,
     order_id      BIGINT      NOT NULL COMMENT '订单ID（逻辑外键）',
@@ -353,7 +353,7 @@ CREATE TABLE order_status_logs
 -- ================================
 
 -- 商品评价表
-CREATE TABLE product_reviews
+CREATE TABLE PRODUCT_REVIEWS
 (
     id                 BIGINT PRIMARY KEY,
     product_id         BIGINT  NOT NULL COMMENT '商品ID（逻辑外键）',
@@ -379,7 +379,7 @@ CREATE TABLE product_reviews
 );
 
 -- 评价点赞表
-CREATE TABLE review_likes
+CREATE TABLE REVIEW_LIKES
 (
     id         BIGINT PRIMARY KEY,
     review_id  BIGINT NOT NULL COMMENT '评价ID（逻辑外键）',
@@ -392,7 +392,7 @@ CREATE TABLE review_likes
 -- ================================
 
 -- 轮播图表
-CREATE TABLE banners
+CREATE TABLE BANNERS
 (
     id           BIGINT PRIMARY KEY,
     title        VARCHAR(200) NOT NULL COMMENT '标题',
@@ -413,7 +413,7 @@ CREATE TABLE banners
 );
 
 -- 优惠券表
-CREATE TABLE coupons
+CREATE TABLE COUPONS
 (
     id                    BIGINT PRIMARY KEY,
     name                  VARCHAR(200)   NOT NULL COMMENT '优惠券名称',
@@ -437,7 +437,7 @@ CREATE TABLE coupons
 );
 
 -- 用户优惠券表
-CREATE TABLE user_coupons
+CREATE TABLE USER_COUPONS
 (
     id         BIGINT PRIMARY KEY,
     user_id    BIGINT    NOT NULL COMMENT '用户ID（逻辑外键）',
@@ -454,7 +454,7 @@ CREATE TABLE user_coupons
 -- ================================
 
 -- 系统配置表
-CREATE TABLE system_configs
+CREATE TABLE SYSTEM_CONFIGS
 (
     id          BIGINT PRIMARY KEY,
     config_key  VARCHAR(100) NOT NULL UNIQUE COMMENT '配置键',
@@ -467,7 +467,7 @@ CREATE TABLE system_configs
 );
 
 -- 操作日志表
-CREATE TABLE operation_logs
+CREATE TABLE OPERATION_LOGS
 (
     id            BIGINT PRIMARY KEY,
     user_id       BIGINT COMMENT '操作用户ID（逻辑外键）',
@@ -589,7 +589,7 @@ CREATE INDEX idx_operation_logs_created_at ON operation_logs(created_at);
 -- ================================
 
 -- 插入系统配置数据
-INSERT INTO system_configs (id, config_key, config_value, description, type, is_public) VALUES
+INSERT INTO MARKET.SYSTEM_CONFIGS (id, config_key, config_value, description, type, is_public) VALUES
 (1, 'site_name', '宁北商城', '网站名称', 'string', 1),
 (2, 'site_logo', '/images/logo.png', '网站Logo', 'string', 1),
 (3, 'site_description', '专业的电商购物平台', '网站描述', 'string', 1),
@@ -602,7 +602,7 @@ INSERT INTO system_configs (id, config_key, config_value, description, type, is_
 (10, 'shipping_free_amount', '99', '免邮金额', 'number', 1);
 
 -- 插入默认分类数据
-INSERT INTO categories (id, name, parent_id, level, path, sort_order, status) VALUES
+INSERT INTO MARKET.CATEGORIES (id, name, parent_id, level, path, sort_order, status) VALUES
 (1, '手机数码', 0, 1, '1', 1, 1),
 (2, '电脑办公', 0, 1, '2', 2, 1),
 (3, '家用电器', 0, 1, '3', 3, 1),
@@ -615,13 +615,13 @@ INSERT INTO categories (id, name, parent_id, level, path, sort_order, status) VA
 (10, '汽车用品', 0, 1, '10', 10, 1);
 
 -- 插入二级分类数据（手机数码）
-INSERT INTO categories (id, name, parent_id, level, path, sort_order, status) VALUES
+INSERT INTO MARKET.CATEGORIES (id, name, parent_id, level, path, sort_order, status) VALUES
 (11, '手机通讯', 1, 2, '1,11', 1, 1),
 (12, '数码配件', 1, 2, '1,12', 2, 1),
 (13, '智能设备', 1, 2, '1,13', 3, 1);
 
 -- 插入品牌数据
-INSERT INTO brands (id, name, english_name, logo, description, country, sort_order, is_hot, status) VALUES
+INSERT INTO MARKET.BRANDS (id, name, english_name, logo, description, country, sort_order, is_hot, status) VALUES
 (1, '苹果', 'Apple', '/images/brands/apple.png', '创新科技品牌', '美国', 1, 1, 1),
 (2, '华为', 'HUAWEI', '/images/brands/huawei.png', '全球领先的ICT基础设施和智能终端提供商', '中国', 2, 1, 1),
 (3, '小米', 'Xiaomi', '/images/brands/xiaomi.png', '专注于高端智能手机、互联网电视以及智能家居生态链建设的创新型科技企业', '中国', 3, 1, 1),

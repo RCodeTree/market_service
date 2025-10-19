@@ -1,4 +1,8 @@
+
+
 -- 测试用户数据插入脚本
+SELECT * FROM MARKET.USERS;
+
 -- 用于测试登录和注册功能
 
 

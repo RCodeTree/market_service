@@ -11,8 +11,6 @@ var usersRouter = require('./routes/users.route');
 
 var app = express();
 
-// 视图引擎设置已移除，项目改为纯API服务
-
 // CORS中间件
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');

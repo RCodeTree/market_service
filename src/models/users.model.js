@@ -133,7 +133,7 @@ class UserModel {
 
             const sql = `
                 INSERT INTO MARKET.USERS (id, username, password_hash, nickname, email, phone,
-                                   agree_terms, agree_privacy, created_at, updated_at)
+                                          agree_terms, agree_privacy, created_at, updated_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
             `;
 
@@ -227,7 +227,7 @@ class UserModel {
 
             const sql = `
                 INSERT INTO MARKET.USER_LOGIN_LOGS (id, user_id, login_ip, user_agent, device, location,
-                                             is_success, fail_reason, created_at)
+                                                    is_success, fail_reason, created_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
             `;
 
@@ -344,12 +344,12 @@ class UserModel {
         if (Array.isArray(rawData)) {
             // 根据findByUsername查询的字段顺序映射
             const [
-                id, username, password_hash, nickname, email, phone, avatar, gender, 
-                birthday, bio, level, points, balance, status, last_login_time, 
-                last_login_ip, login_count, remember_token, email_verified, 
+                id, username, password_hash, nickname, email, phone, avatar, gender,
+                birthday, bio, level, points, balance, status, last_login_time,
+                last_login_ip, login_count, remember_token, email_verified,
                 phone_verified, agree_terms, agree_privacy, created_at, updated_at
             ] = rawData;
-            
+
             return {
                 id,
                 username,

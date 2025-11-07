@@ -44,15 +44,15 @@ CREATE TABLE USERS
 -- 用户登录记录表（记录登录历史）
 CREATE TABLE USER_LOGIN_LOGS
 (
-    id         BIGINT PRIMARY KEY,
-    user_id    BIGINT      NOT NULL COMMENT '用户ID（逻辑外键）',
-    login_ip   VARCHAR(45) NOT NULL COMMENT '登录IP',
-    user_agent VARCHAR(500) COMMENT '用户代理',
-    device     VARCHAR(100) COMMENT '设备信息',
-    location   VARCHAR(100) COMMENT '登录地点',
-    is_success TINYINT     DEFAULT 1 COMMENT '是否成功：0-失败，1-成功',
+    id          BIGINT PRIMARY KEY,
+    user_id     BIGINT      NOT NULL COMMENT '用户ID（逻辑外键）',
+    login_ip    VARCHAR(45) NOT NULL COMMENT '登录IP',
+    user_agent  VARCHAR(500) COMMENT '用户代理',
+    device      VARCHAR(100) COMMENT '设备信息',
+    location    VARCHAR(100) COMMENT '登录地点',
+    is_success  TINYINT   DEFAULT 1 COMMENT '是否成功：0-失败，1-成功',
     fail_reason VARCHAR(200) COMMENT '失败原因',
-    created_at TIMESTAMP   DEFAULT CURRENT_TIMESTAMP COMMENT '登录时间'
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '登录时间'
 );
 
 -- 密码重置表（忘记密码功能）
@@ -64,8 +64,8 @@ CREATE TABLE PASSWORD_RESETS
     phone      VARCHAR(20) COMMENT '重置手机号',
     token      VARCHAR(255) NOT NULL COMMENT '重置令牌',
     expires_at TIMESTAMP    NOT NULL COMMENT '过期时间',
-    used       TINYINT      DEFAULT 0 COMMENT '是否已使用：0-否，1-是',
-    created_at TIMESTAMP    DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'
+    used       TINYINT   DEFAULT 0 COMMENT '是否已使用：0-否，1-是',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'
 );
 
 -- 用户地址表
@@ -456,33 +456,33 @@ CREATE TABLE USER_COUPONS
 -- 系统配置表
 CREATE TABLE SYSTEM_CONFIGS
 (
-    id          BIGINT PRIMARY KEY,
-    config_key  VARCHAR(100) NOT NULL UNIQUE COMMENT '配置键',
+    id           BIGINT PRIMARY KEY,
+    config_key   VARCHAR(100) NOT NULL UNIQUE COMMENT '配置键',
     config_value TEXT COMMENT '配置值',
-    description VARCHAR(500) COMMENT '配置描述',
-    type        VARCHAR(20) DEFAULT 'string' COMMENT '数据类型：string,number,boolean,json',
-    is_public   TINYINT     DEFAULT 0 COMMENT '是否公开：0-否，1-是',
-    created_at  TIMESTAMP   DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    updated_at  TIMESTAMP   DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间'
+    description  VARCHAR(500) COMMENT '配置描述',
+    type         VARCHAR(20) DEFAULT 'string' COMMENT '数据类型：string,number,boolean,json',
+    is_public    TINYINT     DEFAULT 0 COMMENT '是否公开：0-否，1-是',
+    created_at   TIMESTAMP   DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_at   TIMESTAMP   DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间'
 );
 
 -- 操作日志表
 CREATE TABLE OPERATION_LOGS
 (
-    id            BIGINT PRIMARY KEY,
-    user_id       BIGINT COMMENT '操作用户ID（逻辑外键）',
-    module        VARCHAR(50)  NOT NULL COMMENT '操作模块',
-    action        VARCHAR(50)  NOT NULL COMMENT '操作动作',
-    description   VARCHAR(500) COMMENT '操作描述',
-    request_url   VARCHAR(500) COMMENT '请求URL',
+    id             BIGINT PRIMARY KEY,
+    user_id        BIGINT COMMENT '操作用户ID（逻辑外键）',
+    module         VARCHAR(50) NOT NULL COMMENT '操作模块',
+    action         VARCHAR(50) NOT NULL COMMENT '操作动作',
+    description    VARCHAR(500) COMMENT '操作描述',
+    request_url    VARCHAR(500) COMMENT '请求URL',
     request_method VARCHAR(10) COMMENT '请求方法',
     request_params TEXT COMMENT '请求参数',
-    response_data TEXT COMMENT '响应数据',
-    ip_address    VARCHAR(45) COMMENT 'IP地址',
-    user_agent    VARCHAR(500) COMMENT '用户代理',
+    response_data  TEXT COMMENT '响应数据',
+    ip_address     VARCHAR(45) COMMENT 'IP地址',
+    user_agent     VARCHAR(500) COMMENT '用户代理',
     execution_time INT COMMENT '执行时间（毫秒）',
-    status        TINYINT     DEFAULT 1 COMMENT '状态：0-失败，1-成功',
-    created_at    TIMESTAMP   DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'
+    status         TINYINT   DEFAULT 1 COMMENT '状态：0-失败，1-成功',
+    created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'
 );
 
 -- ================================
@@ -490,142 +490,732 @@ CREATE TABLE OPERATION_LOGS
 -- ================================
 
 -- 用户表索引
-CREATE INDEX idx_users_username ON users(username);
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_phone ON users(phone);
-CREATE INDEX idx_users_status ON users(status);
-CREATE INDEX idx_users_created_at ON users(created_at);
+CREATE INDEX idx_users_username ON users (username);
+
+CREATE INDEX idx_users_email ON users (email);
+
+CREATE INDEX idx_users_phone ON users (phone);
+
+CREATE INDEX idx_users_status ON users (status);
+
+CREATE INDEX idx_users_created_at ON users (created_at);
 
 -- 用户登录记录索引
-CREATE INDEX idx_user_login_logs_user_id ON user_login_logs(user_id);
-CREATE INDEX idx_user_login_logs_created_at ON user_login_logs(created_at);
+CREATE INDEX idx_user_login_logs_user_id ON user_login_logs (user_id);
+
+CREATE INDEX idx_user_login_logs_created_at ON user_login_logs (created_at);
 
 -- 密码重置表索引
-CREATE INDEX idx_password_resets_user_id ON password_resets(user_id);
-CREATE INDEX idx_password_resets_token ON password_resets(token);
-CREATE INDEX idx_password_resets_expires_at ON password_resets(expires_at);
+CREATE INDEX idx_password_resets_user_id ON password_resets (user_id);
+
+CREATE INDEX idx_password_resets_token ON password_resets (token);
+
+CREATE INDEX idx_password_resets_expires_at ON password_resets (expires_at);
 
 -- 用户地址表索引
-CREATE INDEX idx_user_addresses_user_id ON user_addresses(user_id);
-CREATE INDEX idx_user_addresses_is_default ON user_addresses(is_default);
+CREATE INDEX idx_user_addresses_user_id ON user_addresses (user_id);
+
+CREATE INDEX idx_user_addresses_is_default ON user_addresses (is_default);
 
 -- 用户收藏表索引
-CREATE INDEX idx_user_favorites_user_id ON user_favorites(user_id);
-CREATE INDEX idx_user_favorites_product_id ON user_favorites(product_id);
-CREATE UNIQUE INDEX idx_user_favorites_unique ON user_favorites(user_id, product_id);
+CREATE INDEX idx_user_favorites_user_id ON user_favorites (user_id);
+
+CREATE INDEX idx_user_favorites_product_id ON user_favorites (product_id);
+
+CREATE UNIQUE INDEX idx_user_favorites_unique ON user_favorites (user_id, product_id);
 
 -- 商品分类表索引
-CREATE INDEX idx_categories_parent_id ON categories(parent_id);
-CREATE INDEX idx_categories_level ON categories(level);
-CREATE INDEX idx_categories_status ON categories(status);
+CREATE INDEX idx_categories_parent_id ON categories (parent_id);
+
+CREATE INDEX idx_categories_level ON categories (level);
+
+CREATE INDEX idx_categories_status ON categories (status);
 
 -- 商品表索引
-CREATE INDEX idx_products_category_id ON products(category_id);
-CREATE INDEX idx_products_brand_id ON products(brand_id);
-CREATE INDEX idx_products_sku ON products(sku);
-CREATE INDEX idx_products_status ON products(status);
-CREATE INDEX idx_products_price ON products(price);
-CREATE INDEX idx_products_sales_count ON products(sales_count);
-CREATE INDEX idx_products_created_at ON products(created_at);
+CREATE INDEX idx_products_category_id ON products (category_id);
+
+CREATE INDEX idx_products_brand_id ON products (brand_id);
+
+CREATE INDEX idx_products_sku ON products (sku);
+
+CREATE INDEX idx_products_status ON products (status);
+
+CREATE INDEX idx_products_price ON products (price);
+
+CREATE INDEX idx_products_sales_count ON products (sales_count);
+
+CREATE INDEX idx_products_created_at ON products (created_at);
 
 -- 商品图片表索引
-CREATE INDEX idx_product_images_product_id ON product_images(product_id);
-CREATE INDEX idx_product_images_is_main ON product_images(is_main);
+CREATE INDEX idx_product_images_product_id ON product_images (product_id);
+
+CREATE INDEX idx_product_images_is_main ON product_images (is_main);
 
 -- 商品SKU表索引
-CREATE INDEX idx_product_skus_product_id ON product_skus(product_id);
-CREATE INDEX idx_product_skus_sku_code ON product_skus(sku_code);
+CREATE INDEX idx_product_skus_product_id ON product_skus (product_id);
+
+CREATE INDEX idx_product_skus_sku_code ON product_skus (sku_code);
 
 -- 购物车表索引
-CREATE INDEX idx_cart_items_user_id ON cart_items(user_id);
-CREATE INDEX idx_cart_items_product_id ON cart_items(product_id);
-CREATE UNIQUE INDEX idx_cart_items_unique ON cart_items(user_id, product_id, sku_id);
+CREATE INDEX idx_cart_items_user_id ON cart_items (user_id);
+
+CREATE INDEX idx_cart_items_product_id ON cart_items (product_id);
+
+CREATE UNIQUE INDEX idx_cart_items_unique ON cart_items (user_id, product_id, sku_id);
 
 -- 订单表索引
-CREATE INDEX idx_orders_user_id ON orders(user_id);
-CREATE INDEX idx_orders_order_no ON orders(order_no);
-CREATE INDEX idx_orders_status ON orders(status);
-CREATE INDEX idx_orders_created_at ON orders(created_at);
+CREATE INDEX idx_orders_user_id ON orders (user_id);
+
+CREATE INDEX idx_orders_order_no ON orders (order_no);
+
+CREATE INDEX idx_orders_status ON orders (status);
+
+CREATE INDEX idx_orders_created_at ON orders (created_at);
 
 -- 订单商品表索引
-CREATE INDEX idx_order_items_order_id ON order_items(order_id);
-CREATE INDEX idx_order_items_product_id ON order_items(product_id);
+CREATE INDEX idx_order_items_order_id ON order_items (order_id);
+
+CREATE INDEX idx_order_items_product_id ON order_items (product_id);
 
 -- 商品评价表索引
-CREATE INDEX idx_product_reviews_product_id ON product_reviews(product_id);
-CREATE INDEX idx_product_reviews_user_id ON product_reviews(user_id);
-CREATE INDEX idx_product_reviews_order_id ON product_reviews(order_id);
-CREATE INDEX idx_product_reviews_rating ON product_reviews(rating);
-CREATE INDEX idx_product_reviews_created_at ON product_reviews(created_at);
+CREATE INDEX idx_product_reviews_product_id ON product_reviews (product_id);
+
+CREATE INDEX idx_product_reviews_user_id ON product_reviews (user_id);
+
+CREATE INDEX idx_product_reviews_order_id ON product_reviews (order_id);
+
+CREATE INDEX idx_product_reviews_rating ON product_reviews (rating);
+
+CREATE INDEX idx_product_reviews_created_at ON product_reviews (created_at);
 
 -- 轮播图表索引
-CREATE INDEX idx_banners_position ON banners(position);
-CREATE INDEX idx_banners_status ON banners(status);
-CREATE INDEX idx_banners_sort_order ON banners(sort_order);
+CREATE INDEX idx_banners_position ON banners (position);
+
+CREATE INDEX idx_banners_status ON banners (status);
+
+CREATE INDEX idx_banners_sort_order ON banners (sort_order);
 
 -- 优惠券表索引
-CREATE INDEX idx_coupons_type ON coupons(type);
-CREATE INDEX idx_coupons_status ON coupons(status);
-CREATE INDEX idx_coupons_start_time ON coupons(start_time);
-CREATE INDEX idx_coupons_end_time ON coupons(end_time);
+CREATE INDEX idx_coupons_type ON coupons (type);
+
+CREATE INDEX idx_coupons_status ON coupons (status);
+
+CREATE INDEX idx_coupons_start_time ON coupons (start_time);
+
+CREATE INDEX idx_coupons_end_time ON coupons (end_time);
 
 -- 用户优惠券表索引
-CREATE INDEX idx_user_coupons_user_id ON user_coupons(user_id);
-CREATE INDEX idx_user_coupons_coupon_id ON user_coupons(coupon_id);
-CREATE INDEX idx_user_coupons_status ON user_coupons(status);
-CREATE INDEX idx_user_coupons_expires_at ON user_coupons(expires_at);
+CREATE INDEX idx_user_coupons_user_id ON user_coupons (user_id);
+
+CREATE INDEX idx_user_coupons_coupon_id ON user_coupons (coupon_id);
+
+CREATE INDEX idx_user_coupons_status ON user_coupons (status);
+
+CREATE INDEX idx_user_coupons_expires_at ON user_coupons (expires_at);
 
 -- 系统配置表索引
-CREATE INDEX idx_system_configs_config_key ON system_configs(config_key);
-CREATE INDEX idx_system_configs_is_public ON system_configs(is_public);
+CREATE INDEX idx_system_configs_config_key ON system_configs (config_key);
+
+CREATE INDEX idx_system_configs_is_public ON system_configs (is_public);
 
 -- 操作日志表索引
-CREATE INDEX idx_operation_logs_user_id ON operation_logs(user_id);
-CREATE INDEX idx_operation_logs_module ON operation_logs(module);
-CREATE INDEX idx_operation_logs_created_at ON operation_logs(created_at);
+CREATE INDEX idx_operation_logs_user_id ON operation_logs (user_id);
+
+CREATE INDEX idx_operation_logs_module ON operation_logs (module);
+
+CREATE INDEX idx_operation_logs_created_at ON operation_logs (created_at);
 
 -- ================================
 -- 9. 初始化数据
 -- ================================
 
 -- 插入系统配置数据
-INSERT INTO MARKET.SYSTEM_CONFIGS (id, config_key, config_value, description, type, is_public) VALUES
-(1, 'site_name', '宁北商城', '网站名称', 'string', 1),
-(2, 'site_logo', '/images/logo.png', '网站Logo', 'string', 1),
-(3, 'site_description', '专业的电商购物平台', '网站描述', 'string', 1),
-(4, 'user_default_avatar', '/images/default-avatar.png', '用户默认头像', 'string', 1),
-(5, 'password_min_length', '6', '密码最小长度', 'number', 1),
-(6, 'remember_me_days', '30', '记住我功能天数', 'number', 0),
-(7, 'password_reset_expires', '24', '密码重置链接有效期（小时）', 'number', 0),
-(8, 'auto_confirm_days', '7', '订单自动确认收货天数', 'number', 1),
-(9, 'review_days_limit', '30', '评价时限（天）', 'number', 1),
-(10, 'shipping_free_amount', '99', '免邮金额', 'number', 1);
+INSERT INTO MARKET.SYSTEM_CONFIGS (id, config_key, config_value, description, type, is_public)
+VALUES (1, 'site_name', '宁北商城', '网站名称', 'string', 1),
+       (2, 'site_logo', '/images/logo.png', '网站Logo', 'string', 1),
+       (3, 'site_description', '专业的电商购物平台', '网站描述', 'string', 1),
+       (4, 'user_default_avatar', '/images/default-avatar.png', '用户默认头像', 'string', 1),
+       (5, 'password_min_length', '6', '密码最小长度', 'number', 1),
+       (6, 'remember_me_days', '30', '记住我功能天数', 'number', 0),
+       (7, 'password_reset_expires', '24', '密码重置链接有效期（小时）', 'number', 0),
+       (8, 'auto_confirm_days', '7', '订单自动确认收货天数', 'number', 1),
+       (9, 'review_days_limit', '30', '评价时限（天）', 'number', 1),
+       (10, 'shipping_free_amount', '99', '免邮金额', 'number', 1);
 
 -- 插入默认分类数据
-INSERT INTO MARKET.CATEGORIES (id, name, parent_id, level, path, sort_order, status) VALUES
-(1, '手机数码', 0, 1, '1', 1, 1),
-(2, '电脑办公', 0, 1, '2', 2, 1),
-(3, '家用电器', 0, 1, '3', 3, 1),
-(4, '服饰内衣', 0, 1, '4', 4, 1),
-(5, '家居家装', 0, 1, '5', 5, 1),
-(6, '母婴用品', 0, 1, '6', 6, 1),
-(7, '食品饮料', 0, 1, '7', 7, 1),
-(8, '美妆个护', 0, 1, '8', 8, 1),
-(9, '运动户外', 0, 1, '9', 9, 1),
-(10, '汽车用品', 0, 1, '10', 10, 1);
+INSERT INTO MARKET.CATEGORIES (id,
+                               name,
+                               parent_id,
+                               level,
+                               path,
+                               sort_order,
+                               status)
+VALUES (1, '手机数码', 0, 1, '1', 1, 1),
+       (2, '电脑办公', 0, 1, '2', 2, 1),
+       (3, '家用电器', 0, 1, '3', 3, 1),
+       (4, '服饰内衣', 0, 1, '4', 4, 1),
+       (5, '家居家装', 0, 1, '5', 5, 1),
+       (6, '母婴用品', 0, 1, '6', 6, 1),
+       (7, '食品饮料', 0, 1, '7', 7, 1),
+       (8, '美妆个护', 0, 1, '8', 8, 1),
+       (9, '运动户外', 0, 1, '9', 9, 1),
+       (10, '汽车用品', 0, 1, '10', 10, 1);
 
 -- 插入二级分类数据（手机数码）
-INSERT INTO MARKET.CATEGORIES (id, name, parent_id, level, path, sort_order, status) VALUES
-(11, '手机通讯', 1, 2, '1,11', 1, 1),
-(12, '数码配件', 1, 2, '1,12', 2, 1),
-(13, '智能设备', 1, 2, '1,13', 3, 1);
+INSERT INTO MARKET.CATEGORIES (id,
+                               name,
+                               parent_id,
+                               level,
+                               path,
+                               sort_order,
+                               status)
+VALUES (11,
+        '手机通讯',
+        1,
+        2,
+        '1,11',
+        1,
+        1),
+       (12,
+        '数码配件',
+        1,
+        2,
+        '1,12',
+        2,
+        1),
+       (13,
+        '智能设备',
+        1,
+        2,
+        '1,13',
+        3,
+        1);
 
 -- 插入品牌数据
-INSERT INTO MARKET.BRANDS (id, name, english_name, logo, description, country, sort_order, is_hot, status) VALUES
-(1, '苹果', 'Apple', '/images/brands/apple.png', '创新科技品牌', '美国', 1, 1, 1),
-(2, '华为', 'HUAWEI', '/images/brands/huawei.png', '全球领先的ICT基础设施和智能终端提供商', '中国', 2, 1, 1),
-(3, '小米', 'Xiaomi', '/images/brands/xiaomi.png', '专注于高端智能手机、互联网电视以及智能家居生态链建设的创新型科技企业', '中国', 3, 1, 1),
-(4, '三星', 'Samsung', '/images/brands/samsung.png', '韩国最大的跨国企业集团', '韩国', 4, 1, 1),
-(5, 'OPPO', 'OPPO', '/images/brands/oppo.png', '专注于手机拍照的品牌', '中国', 5, 1, 1);
+INSERT INTO MARKET.BRANDS (id,
+                           name,
+                           english_name,
+                           logo,
+                           description,
+                           country,
+                           sort_order,
+                           is_hot,
+                           status)
+VALUES (1,
+        '苹果',
+        'Apple',
+        '/images/brands/apple.png',
+        '创新科技品牌',
+        '美国',
+        1,
+        1,
+        1),
+       (2,
+        '华为',
+        'HUAWEI',
+        '/images/brands/huawei.png',
+        '全球领先的ICT基础设施和智能终端提供商',
+        '中国',
+        2,
+        1,
+        1),
+       (3,
+        '小米',
+        'Xiaomi',
+        '/images/brands/xiaomi.png',
+        '专注于高端智能手机、互联网电视以及智能家居生态链建设的创新型科技企业',
+        '中国',
+        3,
+        1,
+        1),
+       (4,
+        '三星',
+        'Samsung',
+        '/images/brands/samsung.png',
+        '韩国最大的跨国企业集团',
+        '韩国',
+        4,
+        1,
+        1),
+       (5,
+        'OPPO',
+        'OPPO',
+        '/images/brands/oppo.png',
+        '专注于手机拍照的品牌',
+        '中国',
+        5,
+        1,
+        1);
 
 COMMIT;
+
+-- ================================
+-- 10. 初始化商品示例数据（用于前端展示联调）
+-- ================================
+
+-- 示例商品：智能手机（iPhone 13）
+INSERT INTO MARKET.PRODUCTS (id,
+                             name,
+                             subtitle,
+                             category_id,
+                             brand_id,
+                             sku,
+                             barcode,
+                             price,
+                             original_price,
+                             cost_price,
+                             stock,
+                             min_stock,
+                             sales_count,
+                             view_count,
+                             favorite_count,
+                             review_count,
+                             rating_avg,
+                             weight,
+                             volume,
+                             unit,
+                             main_image,
+                             video_url,
+                             description,
+                             detail_html,
+                             detail_mobile_html,
+                             keywords,
+                             tags,
+                             attributes,
+                             shipping_template_id,
+                             service_guarantee,
+                             is_virtual,
+                             is_hot,
+                             is_new,
+                             is_recommend,
+                             is_limited,
+                             status,
+                             created_at,
+                             updated_at)
+VALUES (1001,
+        'Apple iPhone 13 128GB',
+        'A15 仿生芯片，超级视网膜 XDR 显示屏',
+        11,
+        1,
+        'APL-IP13-128-BLK',
+        '6901234567890',
+        4999.00,
+        5999.00,
+        3800.00,
+        120,
+        10,
+        4500,
+        12800,
+        800,
+        320,
+        4.7,
+        0.173,
+        0.0005,
+        '件',
+        'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&h=800&fit=crop',
+        NULL,
+        'A15 仿生芯片，超高性能与能效。双摄系统，夜间模式更强。',
+        '<h3>产品特色</h3><ul><li>A15 仿生芯片</li><li>6.1 英寸超级视网膜 XDR 显示屏</li><li>双摄系统</li></ul>',
+        '<h3>移动端详情</h3><p>更轻更薄，性能更强。</p>',
+        '手机,苹果,智能设备',
+        '旗舰机型,5G,高性能',
+        '{"屏幕尺寸":"6.1英寸","处理器":"A15","存储":"128GB","电池":"3095mAh"}',
+        NULL,
+        '正品保障,7天无理由退换,快速配送',
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP);
+
+-- 商品图片（iPhone 13）
+INSERT INTO MARKET.PRODUCT_IMAGES (id,
+                                   product_id,
+                                   image_url,
+                                   alt_text,
+                                   sort_order,
+                                   is_main,
+                                   image_type,
+                                   created_at)
+VALUES (20011,
+        1001,
+        'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&h=800&fit=crop',
+        'iPhone 13 主图',
+        1,
+        1,
+        1,
+        CURRENT_TIMESTAMP),
+       (20012,
+        1001,
+        'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800&h=800&fit=crop',
+        'iPhone 13 图2',
+        2,
+        0,
+        1,
+        CURRENT_TIMESTAMP),
+       (20013,
+        1001,
+        'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&h=800&fit=crop',
+        'iPhone 13 图3',
+        3,
+        0,
+        1,
+        CURRENT_TIMESTAMP);
+
+-- 商品规格（iPhone 13）
+INSERT INTO MARKET.PRODUCT_SPEC_NAMES (id,
+                                       product_id,
+                                       spec_name,
+                                       sort_order,
+                                       created_at)
+VALUES (30011,
+        1001,
+        '颜色',
+        1,
+        CURRENT_TIMESTAMP),
+       (30012,
+        1001,
+        '存储容量',
+        2,
+        CURRENT_TIMESTAMP);
+
+INSERT INTO MARKET.PRODUCT_SPEC_VALUES (id,
+                                        spec_name_id,
+                                        spec_value,
+                                        image,
+                                        sort_order,
+                                        created_at)
+VALUES (30111,
+        30011,
+        '黑色',
+        NULL,
+        1,
+        CURRENT_TIMESTAMP),
+       (30112,
+        30011,
+        '白色',
+        NULL,
+        2,
+        CURRENT_TIMESTAMP),
+       (30121,
+        30012,
+        '128GB',
+        NULL,
+        1,
+        CURRENT_TIMESTAMP),
+       (30122,
+        30012,
+        '256GB',
+        NULL,
+        2,
+        CURRENT_TIMESTAMP);
+
+-- 示例商品：华为 Mate 50
+INSERT INTO MARKET.PRODUCTS (id,
+                             name,
+                             subtitle,
+                             category_id,
+                             brand_id,
+                             sku,
+                             barcode,
+                             price,
+                             original_price,
+                             cost_price,
+                             stock,
+                             min_stock,
+                             sales_count,
+                             view_count,
+                             favorite_count,
+                             review_count,
+                             rating_avg,
+                             weight,
+                             volume,
+                             unit,
+                             main_image,
+                             video_url,
+                             description,
+                             detail_html,
+                             detail_mobile_html,
+                             keywords,
+                             tags,
+                             attributes,
+                             shipping_template_id,
+                             service_guarantee,
+                             is_virtual,
+                             is_hot,
+                             is_new,
+                             is_recommend,
+                             is_limited,
+                             status,
+                             created_at,
+                             updated_at)
+VALUES (1002,
+        'HUAWEI Mate 50 256GB',
+        '昆仑玻璃，影像旗舰',
+        11,
+        2,
+        'HUA-M50-256-OR',
+        '6901234567891',
+        5699.00,
+        6299.00,
+        4200.00,
+        80,
+        10,
+        5200,
+        9800,
+        600,
+        400,
+        4.8,
+        0.205,
+        0.0006,
+        '件',
+        'https://images.unsplash.com/photo-1570813095265-2bb5df9f89ff?w=800&h=800&fit=crop',
+        NULL,
+        '昆仑玻璃加持，抗跌耐用；XMAGE影像系统，拍照更强。',
+        '<h3>产品特色</h3><ul><li>XMAGE 影像</li><li>高强度昆仑玻璃</li><li>鸿蒙系统</li></ul>',
+        '<p>移动端详情：影像旗舰，实力出众。</p>',
+        '手机,华为,旗舰',
+        '旗舰机型,影像,耐用',
+        '{"屏幕尺寸":"6.7英寸","处理器":"骁龙8+","存储":"256GB","电池":"4700mAh"}',
+        NULL,
+        '正品保障,7天无理由退换,快速配送',
+        0,
+        1,
+        1,
+        1,
+        0,
+        1,
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP);
+
+INSERT INTO MARKET.PRODUCT_IMAGES (id,
+                                   product_id,
+                                   image_url,
+                                   alt_text,
+                                   sort_order,
+                                   is_main,
+                                   image_type,
+                                   created_at)
+VALUES (20021,
+        1002,
+        'https://images.unsplash.com/photo-1570813095265-2bb5df9f89ff?w=800&h=800&fit=crop',
+        'Mate 50 主图',
+        1,
+        1,
+        1,
+        CURRENT_TIMESTAMP),
+       (20022,
+        1002,
+        'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&h=800&fit=crop',
+        'Mate 50 图2',
+        2,
+        0,
+        1,
+        CURRENT_TIMESTAMP);
+
+INSERT INTO MARKET.PRODUCT_SPEC_NAMES (id,
+                                       product_id,
+                                       spec_name,
+                                       sort_order,
+                                       created_at)
+VALUES (30021,
+        1002,
+        '颜色',
+        1,
+        CURRENT_TIMESTAMP),
+       (30022,
+        1002,
+        '存储容量',
+        2,
+        CURRENT_TIMESTAMP);
+
+INSERT INTO MARKET.PRODUCT_SPEC_VALUES (id,
+                                        spec_name_id,
+                                        spec_value,
+                                        image,
+                                        sort_order,
+                                        created_at)
+VALUES (30211,
+        30021,
+        '橙色',
+        NULL,
+        1,
+        CURRENT_TIMESTAMP),
+       (30212,
+        30021,
+        '黑色',
+        NULL,
+        2,
+        CURRENT_TIMESTAMP),
+       (30221,
+        30022,
+        '256GB',
+        NULL,
+        1,
+        CURRENT_TIMESTAMP),
+       (30222,
+        30022,
+        '512GB',
+        NULL,
+        2,
+        CURRENT_TIMESTAMP);
+
+-- 示例商品：小米电视 55"
+INSERT INTO MARKET.PRODUCTS (id,
+                             name,
+                             subtitle,
+                             category_id,
+                             brand_id,
+                             sku,
+                             barcode,
+                             price,
+                             original_price,
+                             cost_price,
+                             stock,
+                             min_stock,
+                             sales_count,
+                             view_count,
+                             favorite_count,
+                             review_count,
+                             rating_avg,
+                             weight,
+                             volume,
+                             unit,
+                             main_image,
+                             video_url,
+                             description,
+                             detail_html,
+                             detail_mobile_html,
+                             keywords,
+                             tags,
+                             attributes,
+                             shipping_template_id,
+                             service_guarantee,
+                             is_virtual,
+                             is_hot,
+                             is_new,
+                             is_recommend,
+                             is_limited,
+                             status,
+                             created_at,
+                             updated_at)
+VALUES (1003,
+        'Xiaomi 小米电视 55英寸 4K',
+        '4K 超高清，HDR 支持',
+        3,
+        3,
+        'XMI-TV55-4K',
+        '6901234567892',
+        1999.00,
+        2499.00,
+        1500.00,
+        60,
+        5,
+        2600,
+        5200,
+        300,
+        180,
+        4.5,
+        12.000,
+        0.0300,
+        '台',
+        'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=800&fit=crop',
+        NULL,
+        '55英寸 4K 显示，HDR 支持，杜比音效。',
+        '<ul><li>4K 分辨率</li><li>HDR10</li><li>杜比音效</li></ul>',
+        '<p>移动端详情：高清大屏，娱乐利器。</p>',
+        '电视,家电,客厅',
+        '4K,HDR,杜比音效',
+        '{"屏幕尺寸":"55英寸","分辨率":"4K","HDR":"支持","音效":"杜比"}',
+        NULL,
+        '正品保障,7天无理由退换,快速配送',
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP);
+
+INSERT INTO MARKET.PRODUCT_IMAGES (id,
+                                   product_id,
+                                   image_url,
+                                   alt_text,
+                                   sort_order,
+                                   is_main,
+                                   image_type,
+                                   created_at)
+VALUES (20031,
+        1003,
+        'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=800&fit=crop',
+        '小米电视 主图',
+        1,
+        1,
+        1,
+        CURRENT_TIMESTAMP),
+       (20032,
+        1003,
+        'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&h=800&fit=crop',
+        '小米电视 图2',
+        2,
+        0,
+        1,
+        CURRENT_TIMESTAMP);
+
+-- 示例商品评价（用于演示）
+INSERT INTO MARKET.PRODUCT_REVIEWS (id,
+                                    product_id,
+                                    user_id,
+                                    order_id,
+                                    order_item_id,
+                                    sku_id,
+                                    rating,
+                                    content,
+                                    images,
+                                    is_anonymous,
+                                    is_additional,
+                                    created_at,
+                                    updated_at)
+VALUES (40011,
+        1001,
+        1,
+        5001,
+        60011,
+        NULL,
+        5,
+        '非常满意，运行流畅，拍照很棒！',
+        NULL,
+        0,
+        0,
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP),
+       (40012,
+        1001,
+        2,
+        5002,
+        60012,
+        NULL,
+        4,
+        '总体不错，续航一般。',
+        NULL,
+        1,
+        0,
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP),
+       (40021,
+        1002,
+        1,
+        5003,
+        60021,
+        NULL,
+        5,
+        '影像很强，屏幕显示效果好。',
+        NULL,
+        0,
+        0,
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP);

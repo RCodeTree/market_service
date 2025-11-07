@@ -224,16 +224,6 @@ router.post('/user/avatar', authMiddleware, (req, res) => {
 // 错误处理
 // ================================
 
-/**
- * 处理未匹配的路由
- */
-router.use('*', (req, res) => {
-    res.status(404).json({
-        success: false,
-        code: 404,
-        message: `路由 ${req.method} ${req.originalUrl} 不存在`,
-        timestamp: new Date().toISOString()
-    });
-});
+// 404 交由应用级处理，避免影响其他模块路由
 
 module.exports = router;

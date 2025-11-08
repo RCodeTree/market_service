@@ -10,6 +10,7 @@ var logger = require('morgan');
 var usersRouter = require('./routes/users.route');
 var productsRouter = require('./routes/products.route');
 var cartRouter = require('./routes/cart.route');
+var ordersRouter = require('./routes/orders.route');
 
 var app = express();
 
@@ -41,6 +42,7 @@ app.set('trust proxy', true);
 app.use('/api', usersRouter);
 app.use('/api', productsRouter);
 app.use('/api', cartRouter);
+app.use('/api', ordersRouter);
 
 
 // 捕获 404 错误并转发到错误处理器

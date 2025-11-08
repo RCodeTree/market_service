@@ -79,21 +79,7 @@ router.put('/user/password', authMiddleware, UserController.changePassword);
 // 用户扩展功能路由（需要登录）
 // ================================
 
-/**
- * 获取用户订单列表
- * GET /api/user/orders
- * 需要认证: 是
- * 查询参数: ?page=1&limit=10&status=pending
- */
-router.get('/user/orders', authMiddleware, (req, res) => {
-    // TODO: 实现订单列表功能
-    res.status(501).json({
-        success: false,
-        code: 501,
-        message: '订单功能尚未实现',
-        timestamp: new Date().toISOString()
-    });
-});
+// 订单相关已迁移至 orders.route.js，避免重复定义
 
 /**
  * 获取用户收藏列表

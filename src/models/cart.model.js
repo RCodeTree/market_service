@@ -17,7 +17,10 @@ class CartModel {
                c.price,
                c.selected,
                p.name AS product_name,
-               p.main_image AS product_image
+               p.main_image AS product_image,
+               p.price AS product_price,
+               p.original_price AS product_original_price,
+               p.stock AS product_stock
         FROM MARKET.CART_ITEMS c
         JOIN MARKET.PRODUCTS p ON p.id = c.product_id
         WHERE c.user_id = ?
@@ -27,7 +30,7 @@ class CartModel {
       const rows = result.rows || [];
       return rows.map(r => {
         if (Array.isArray(r)) {
-          const [id, product_id, sku_id, quantity, price, selected, product_name, product_image] = r;
+          const [id, product_id, sku_id, quantity, price, selected, product_name, product_image, product_price, product_original_price, product_stock] = r;
           return {
             id,
             productId: product_id,
@@ -36,7 +39,10 @@ class CartModel {
             price,
             selected: !!selected,
             productName: product_name,
-            productImage: product_image
+            productImage: product_image,
+            productPrice: product_price,
+            productOriginalPrice: product_original_price,
+            productStock: product_stock
           };
         }
         return {
@@ -47,7 +53,10 @@ class CartModel {
           price: r.PRICE,
           selected: !!r.SELECTED,
           productName: r.PRODUCT_NAME,
-          productImage: r.PRODUCT_IMAGE
+          productImage: r.PRODUCT_IMAGE,
+          productPrice: r.PRODUCT_PRICE,
+          productOriginalPrice: r.PRODUCT_ORIGINAL_PRICE,
+          productStock: r.PRODUCT_STOCK
         };
       });
     } catch (error) {

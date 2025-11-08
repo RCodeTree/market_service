@@ -38,10 +38,9 @@ app.set('trust proxy', true);
 /*
     注册路由
 */
-// 先挂载商品路由，避免 usersRouter 的 404 捕获到其它模块路径
+app.use('/api', usersRouter);
 app.use('/api', productsRouter);
 app.use('/api', cartRouter);
-app.use('/api', usersRouter);
 
 
 // 捕获 404 错误并转发到错误处理器

@@ -1,4 +1,5 @@
 const UserService = require('../services/users.service');
+const { ok, error, jsonResponse } = require('../utils/response');
 
 /**
  * 用户控制器
@@ -15,12 +16,7 @@ class UserController {
 
             // 验证确认密码
             if (password !== confirmPassword) {
-                return res.status(400).json({
-                    success: false,
-                    code: 400,
-                    message: '两次输入的密码不一致',
-                    timestamp: new Date().toISOString()
-                });
+                return error(res, 400, '两次输入的密码不一致');
             }
 
             const result = await UserService.register({
@@ -31,7 +27,7 @@ class UserController {
             });
 
             if (result.success) {
-                return res.status(201).json({
+                return jsonResponse(res, 201, {
                     success: true,
                     code: 201,
                     message: result.message,
@@ -39,21 +35,11 @@ class UserController {
                     timestamp: new Date().toISOString()
                 });
             } else {
-                return res.status(400).json({
-                    success: false,
-                    code: 400,
-                    message: result.message,
-                    timestamp: new Date().toISOString()
-                });
+                return error(res, 400, result.message);
             }
         } catch (error) {
             console.error('注册控制器错误:', error);
-            return res.status(500).json({
-                success: false,
-                code: 500,
-                message: '服务器内部错误',
-                timestamp: new Date().toISOString()
-            });
+            return error(res, 500, '服务器内部错误');
         }
     }
 
@@ -76,29 +62,13 @@ class UserController {
             );
 
             if (result.success) {
-                return res.status(200).json({
-                    success: true,
-                    code: 200,
-                    message: result.message,
-                    data: result.data,
-                    timestamp: new Date().toISOString()
-                });
+                return ok(res, result.message, result.data);
             } else {
-                return res.status(401).json({
-                    success: false,
-                    code: 401,
-                    message: result.message,
-                    timestamp: new Date().toISOString()
-                });
+                return error(res, 401, result.message);
             }
         } catch (error) {
             console.error('登录控制器错误:', error);
-            return res.status(500).json({
-                success: false,
-                code: 500,
-                message: '服务器内部错误',
-                timestamp: new Date().toISOString()
-            });
+            return error(res, 500, '服务器内部错误');
         }
     }
 
@@ -113,29 +83,13 @@ class UserController {
             const result = await UserService.getUserInfo(userId);
 
             if (result.success) {
-                return res.status(200).json({
-                    success: true,
-                    code: 200,
-                    message: '获取用户信息成功',
-                    data: result.data,
-                    timestamp: new Date().toISOString()
-                });
+                return ok(res, '获取用户信息成功', result.data);
             } else {
-                return res.status(404).json({
-                    success: false,
-                    code: 404,
-                    message: result.message,
-                    timestamp: new Date().toISOString()
-                });
+                return error(res, 404, result.message);
             }
         } catch (error) {
             console.error('获取用户信息控制器错误:', error);
-            return res.status(500).json({
-                success: false,
-                code: 500,
-                message: '服务器内部错误',
-                timestamp: new Date().toISOString()
-            });
+            return error(res, 500, '服务器内部错误');
         }
     }
 
@@ -157,29 +111,13 @@ class UserController {
             const result = await UserService.updateProfile(userId, updateData);
 
             if (result.success) {
-                return res.status(200).json({
-                    success: true,
-                    code: 200,
-                    message: result.message,
-                    data: result.data,
-                    timestamp: new Date().toISOString()
-                });
+                return ok(res, result.message, result.data);
             } else {
-                return res.status(400).json({
-                    success: false,
-                    code: 400,
-                    message: result.message,
-                    timestamp: new Date().toISOString()
-                });
+                return error(res, 400, result.message);
             }
         } catch (error) {
             console.error('更新用户信息控制器错误:', error);
-            return res.status(500).json({
-                success: false,
-                code: 500,
-                message: '服务器内部错误',
-                timestamp: new Date().toISOString()
-            });
+            return error(res, 500, '服务器内部错误');
         }
     }
 
@@ -194,12 +132,7 @@ class UserController {
 
             // 验证确认密码
             if (newPassword !== confirmPassword) {
-                return res.status(400).json({
-                    success: false,
-                    code: 400,
-                    message: '两次输入的新密码不一致',
-                    timestamp: new Date().toISOString()
-                });
+                return error(res, 400, '两次输入的新密码不一致');
             }
 
             const result = await UserService.changePassword(userId, {
@@ -208,28 +141,13 @@ class UserController {
             });
 
             if (result.success) {
-                return res.status(200).json({
-                    success: true,
-                    code: 200,
-                    message: result.message,
-                    timestamp: new Date().toISOString()
-                });
+                return ok(res, result.message);
             } else {
-                return res.status(400).json({
-                    success: false,
-                    code: 400,
-                    message: result.message,
-                    timestamp: new Date().toISOString()
-                });
+                return error(res, 400, result.message);
             }
         } catch (error) {
             console.error('修改密码控制器错误:', error);
-            return res.status(500).json({
-                success: false,
-                code: 500,
-                message: '服务器内部错误',
-                timestamp: new Date().toISOString()
-            });
+            return error(res, 500, '服务器内部错误');
         }
     }
 
@@ -244,29 +162,13 @@ class UserController {
             const result = await UserService.checkUsernameAvailable(username);
 
             if (result.success) {
-                return res.status(200).json({
-                    success: true,
-                    code: 200,
-                    message: '检查完成',
-                    data: result.data,
-                    timestamp: new Date().toISOString()
-                });
+                return ok(res, '检查完成', result.data);
             } else {
-                return res.status(400).json({
-                    success: false,
-                    code: 400,
-                    message: result.message,
-                    timestamp: new Date().toISOString()
-                });
+                return error(res, 400, result.message);
             }
         } catch (error) {
             console.error('检查用户名控制器错误:', error);
-            return res.status(500).json({
-                success: false,
-                code: 500,
-                message: '服务器内部错误',
-                timestamp: new Date().toISOString()
-            });
+            return error(res, 500, '服务器内部错误');
         }
     }
 
@@ -279,20 +181,10 @@ class UserController {
             // 在实际应用中，可以将token加入黑名单
             // 这里简单返回成功响应，客户端删除token
 
-            return res.status(200).json({
-                success: true,
-                code: 200,
-                message: '登出成功',
-                timestamp: new Date().toISOString()
-            });
+            return ok(res, '登出成功');
         } catch (error) {
             console.error('登出控制器错误:', error);
-            return res.status(500).json({
-                success: false,
-                code: 500,
-                message: '服务器内部错误',
-                timestamp: new Date().toISOString()
-            });
+            return error(res, 500, '服务器内部错误');
         }
     }
 
@@ -308,35 +200,13 @@ class UserController {
             const result = await UserService.getUserInfo(userId);
 
             if (result.success) {
-                return res.status(200).json({
-                    success: true,
-                    code: 200,
-                    message: 'Token有效',
-                    data: {
-                        valid: true,
-                        user: result.data
-                    },
-                    timestamp: new Date().toISOString()
-                });
+                return ok(res, 'Token有效', { valid: true, user: result.data });
             } else {
-                return res.status(401).json({
-                    success: false,
-                    code: 401,
-                    message: 'Token无效',
-                    data: {
-                        valid: false
-                    },
-                    timestamp: new Date().toISOString()
-                });
+                return error(res, 401, 'Token无效', 401, { data: { valid: false } });
             }
         } catch (error) {
             console.error('验证token控制器错误:', error);
-            return res.status(500).json({
-                success: false,
-                code: 500,
-                message: '服务器内部错误',
-                timestamp: new Date().toISOString()
-            });
+            return error(res, 500, '服务器内部错误');
         }
     }
 }

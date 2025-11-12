@@ -390,7 +390,7 @@ class UserService {
             }
 
             // 获取用户信息
-            const user = await UserModel.findByUsername(userId);
+            const user = await UserModel.findById(userId);
             if (!user) {
                 throw new Error('用户不存在');
             }

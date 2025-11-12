@@ -5,6 +5,9 @@ const {GetDatabase} = require('../config/db');
  * 负责用户相关的数据库操作
  */
 class UserModel {
+    static toNumber(v) {
+        return typeof v === 'bigint' ? Number(v) : v;
+    }
     /**
      * 根据用户名查找用户
      * @param {string} username - 用户名
@@ -321,7 +324,9 @@ class UserModel {
             const sql = 'SELECT COUNT(*) as count FROM MARKET.USERS WHERE username = ?';
             const result = await conn.execute(sql, [username]);
 
-            return result.rows[0].COUNT > 0;
+            const cntRaw = typeof result.rows[0].COUNT !== 'undefined' ? result.rows[0].COUNT : result.rows[0][0];
+            const count = this.toNumber(cntRaw);
+            return count > 0;
         } catch (error) {
             console.error('检查用户名失败:', error);
             throw new Error('检查用户名失败');
@@ -351,7 +356,7 @@ class UserModel {
             ] = rawData;
 
             return {
-                id,
+                id: this.toNumber(id),
                 username,
                 password_hash,
                 nickname,
@@ -361,18 +366,18 @@ class UserModel {
                 gender,
                 birthday,
                 bio,
-                level,
-                points,
-                balance,
-                status,
+                level: this.toNumber(level),
+                points: this.toNumber(points),
+                balance: this.toNumber(balance),
+                status: this.toNumber(status),
                 last_login_time,
                 last_login_ip,
-                login_count,
+                login_count: this.toNumber(login_count),
                 remember_token,
-                email_verified,
-                phone_verified,
-                agree_terms,
-                agree_privacy,
+                email_verified: this.toNumber(email_verified),
+                phone_verified: this.toNumber(phone_verified),
+                agree_terms: this.toNumber(agree_terms),
+                agree_privacy: this.toNumber(agree_privacy),
                 created_at,
                 updated_at
             };
@@ -380,7 +385,7 @@ class UserModel {
 
         // 处理对象格式数据（兼容性保留）
         return {
-            id: rawData.ID,
+            id: this.toNumber(rawData.ID),
             username: rawData.USERNAME,
             password_hash: rawData.PASSWORD_HASH,
             nickname: rawData.NICKNAME,
@@ -390,18 +395,18 @@ class UserModel {
             gender: rawData.GENDER,
             birthday: rawData.BIRTHDAY,
             bio: rawData.BIO,
-            level: rawData.LEVEL,
-            points: rawData.POINTS,
-            balance: rawData.BALANCE,
-            status: rawData.STATUS,
+            level: this.toNumber(rawData.LEVEL),
+            points: this.toNumber(rawData.POINTS),
+            balance: this.toNumber(rawData.BALANCE),
+            status: this.toNumber(rawData.STATUS),
             last_login_time: rawData.LAST_LOGIN_TIME,
             last_login_ip: rawData.LAST_LOGIN_IP,
-            login_count: rawData.LOGIN_COUNT,
+            login_count: this.toNumber(rawData.LOGIN_COUNT),
             remember_token: rawData.REMEMBER_TOKEN,
-            email_verified: rawData.EMAIL_VERIFIED,
-            phone_verified: rawData.PHONE_VERIFIED,
-            agree_terms: rawData.AGREE_TERMS,
-            agree_privacy: rawData.AGREE_PRIVACY,
+            email_verified: this.toNumber(rawData.EMAIL_VERIFIED),
+            phone_verified: this.toNumber(rawData.PHONE_VERIFIED),
+            agree_terms: this.toNumber(rawData.AGREE_TERMS),
+            agree_privacy: this.toNumber(rawData.AGREE_PRIVACY),
             created_at: rawData.CREATED_AT,
             updated_at: rawData.UPDATED_AT
         };

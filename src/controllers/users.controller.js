@@ -12,7 +12,7 @@ class UserController {
      */
     static async register(req, res) {
         try {
-            const {username, password, confirmPassword, email, phone} = req.body;
+            const { username, password, confirmPassword, email, phone } = req.body;
 
             // 验证确认密码
             if (password !== confirmPassword) {
@@ -37,8 +37,8 @@ class UserController {
             } else {
                 return error(res, 400, result.message);
             }
-        } catch (error) {
-            console.error('注册控制器错误:', error);
+        } catch (err) {
+            console.error('注册控制器错误:', err);
             return error(res, 500, '服务器内部错误');
         }
     }
@@ -49,14 +49,14 @@ class UserController {
      */
     static async login(req, res) {
         try {
-            const {username, password, remember} = req.body;
+            const { username, password, remember } = req.body;
 
             // 获取客户端信息
             const clientIp = req.ip || req.connection.remoteAddress || req.socket.remoteAddress;
             const userAgent = req.get('User-Agent');
 
             const result = await UserService.login(
-                {username, password, remember},
+                { username, password, remember },
                 clientIp,
                 userAgent
             );
@@ -66,8 +66,8 @@ class UserController {
             } else {
                 return error(res, 401, result.message);
             }
-        } catch (error) {
-            console.error('登录控制器错误:', error);
+        } catch (err) {
+            console.error('登录控制器错误:', err);
             return error(res, 500, '服务器内部错误');
         }
     }
@@ -87,8 +87,8 @@ class UserController {
             } else {
                 return error(res, 404, result.message);
             }
-        } catch (error) {
-            console.error('获取用户信息控制器错误:', error);
+        } catch (err) {
+            console.error('获取用户信息控制器错误:', err);
             return error(res, 500, '服务器内部错误');
         }
     }
@@ -115,8 +115,8 @@ class UserController {
             } else {
                 return error(res, 400, result.message);
             }
-        } catch (error) {
-            console.error('更新用户信息控制器错误:', error);
+        } catch (err) {
+            console.error('更新用户信息控制器错误:', err);
             return error(res, 500, '服务器内部错误');
         }
     }
@@ -128,7 +128,7 @@ class UserController {
     static async changePassword(req, res) {
         try {
             const userId = req.user.userId;
-            const {oldPassword, newPassword, confirmPassword} = req.body;
+            const { oldPassword, newPassword, confirmPassword } = req.body;
 
             // 验证确认密码
             if (newPassword !== confirmPassword) {
@@ -145,8 +145,8 @@ class UserController {
             } else {
                 return error(res, 400, result.message);
             }
-        } catch (error) {
-            console.error('修改密码控制器错误:', error);
+        } catch (err) {
+            console.error('修改密码控制器错误:', err);
             return error(res, 500, '服务器内部错误');
         }
     }
@@ -157,7 +157,7 @@ class UserController {
      */
     static async checkUsername(req, res) {
         try {
-            const {username} = req.params;
+            const { username } = req.params;
 
             const result = await UserService.checkUsernameAvailable(username);
 
@@ -166,8 +166,8 @@ class UserController {
             } else {
                 return error(res, 400, result.message);
             }
-        } catch (error) {
-            console.error('检查用户名控制器错误:', error);
+        } catch (err) {
+            console.error('检查用户名控制器错误:', err);
             return error(res, 500, '服务器内部错误');
         }
     }
@@ -182,8 +182,8 @@ class UserController {
             // 这里简单返回成功响应，客户端删除token
 
             return ok(res, '登出成功');
-        } catch (error) {
-            console.error('登出控制器错误:', error);
+        } catch (err) {
+            console.error('登出控制器错误:', err);
             return error(res, 500, '服务器内部错误');
         }
     }
@@ -204,8 +204,8 @@ class UserController {
             } else {
                 return error(res, 401, 'Token无效', 401, { data: { valid: false } });
             }
-        } catch (error) {
-            console.error('验证token控制器错误:', error);
+        } catch (err) {
+            console.error('验证token控制器错误:', err);
             return error(res, 500, '服务器内部错误');
         }
     }
@@ -262,6 +262,104 @@ class UserController {
             }
             return error(res, 400, result.message || '批量移除收藏失败');
         } catch (e) {
+            return error(res, 500, '服务器内部错误');
+        }
+    }
+
+    static async uploadAvatar(req, res) {
+        const fs = require('fs');
+        const path = require('path');
+        try {
+            const userId = req.user.userId;
+            const { dataUrl } = req.body;
+            if (!dataUrl || typeof dataUrl !== 'string' || !dataUrl.startsWith('data:')) {
+                return error(res, 400, '无效的头像数据');
+            }
+            const match = dataUrl.match(/^data:(image\/(png|jpeg|jpg));base64,(.+)$/);
+            if (!match) {
+                return error(res, 400, '仅支持 PNG/JPEG 图片');
+            }
+            const mime = match[1];
+            const ext = mime.includes('png') ? 'png' : 'jpg';
+            const base64 = match[3];
+            const buffer = Buffer.from(base64, 'base64');
+            const uploadsDir = path.join(__dirname, 'public', 'uploads', 'avatars');
+            fs.mkdirSync(uploadsDir, { recursive: true });
+            const filename = `${userId}_${Date.now()}.${ext}`;
+            const filePath = path.join(uploadsDir, filename);
+            fs.writeFileSync(filePath, buffer);
+            const url = `/uploads/avatars/${filename}`;
+            const result = await UserService.updateProfile(userId, { avatar: url });
+            if (result.success) {
+                return ok(res, '头像更新成功', { avatar: url, user: result.data });
+            }
+            return error(res, 400, result.message || '头像更新失败');
+        } catch (err) {
+            console.error('上传头像控制器错误:', err);
+            return error(res, 500, '服务器内部错误');
+        }
+    }
+
+    static async getUserStats(req, res) {
+        try {
+            const userId = req.user.userId;
+            const result = await UserService.getUserStats(userId);
+            if (result.success) {
+                return ok(res, '获取统计成功', result.data);
+            }
+            return error(res, 400, result.message || '获取统计失败');
+        } catch (err) {
+            console.error('获取用户统计控制器错误:', err);
+            return error(res, 500, '服务器内部错误');
+        }
+    }
+
+    static async getAddresses(req, res) {
+        try {
+            const userId = req.user.userId;
+            const result = await UserService.listAddresses(userId);
+            if (result.success) return ok(res, '获取地址成功', result.data);
+            return error(res, 400, result.message || '获取地址失败');
+        } catch (err) {
+            console.error('获取地址控制器错误:', err);
+            return error(res, 500, '服务器内部错误');
+        }
+    }
+
+    static async addAddress(req, res) {
+        try {
+            const userId = req.user.userId;
+            const result = await UserService.createAddress(userId, req.body || {});
+            if (result.success) return ok(res, '新增地址成功', result.data);
+            return error(res, 400, result.message || '新增地址失败');
+        } catch (err) {
+            console.error('新增地址控制器错误:', err);
+            return error(res, 500, '服务器内部错误');
+        }
+    }
+
+    static async updateAddress(req, res) {
+        try {
+            const userId = req.user.userId;
+            const { id } = req.params;
+            const result = await UserService.updateAddress(userId, Number(id), req.body || {});
+            if (result.success) return ok(res, '更新地址成功', result.data);
+            return error(res, 400, result.message || '更新地址失败');
+        } catch (err) {
+            console.error('更新地址控制器错误:', err);
+            return error(res, 500, '服务器内部错误');
+        }
+    }
+
+    static async deleteAddress(req, res) {
+        try {
+            const userId = req.user.userId;
+            const { id } = req.params;
+            const result = await UserService.deleteAddress(userId, Number(id));
+            if (result.success) return ok(res, '删除地址成功', result.data);
+            return error(res, 400, result.message || '删除地址失败');
+        } catch (err) {
+            console.error('删除地址控制器错误:', err);
             return error(res, 500, '服务器内部错误');
         }
     }

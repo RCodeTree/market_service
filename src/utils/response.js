@@ -2,7 +2,18 @@
  * 统一 JSON 响应工具
  * - 处理 BigInt 自动转换
  */
-const safeStringify = (obj) => JSON.stringify(obj, (_, value) => (typeof value === 'bigint' ? Number(value) : value));
+const safeStringify = (obj) => {
+  const seen = new WeakSet();
+  const replacer = (_, value) => {
+    if (typeof value === 'bigint') return Number(value);
+    if (value && typeof value === 'object') {
+      if (seen.has(value)) return undefined;
+      seen.add(value);
+    }
+    return value;
+  };
+  return JSON.stringify(obj, replacer);
+};
 
 const jsonResponse = (res, statusCode, payload) => {
   res.set('Content-Type', 'application/json');

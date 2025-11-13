@@ -458,6 +458,59 @@ class UserService {
             return { success: false, message: error.message || '批量移除收藏失败' };
         }
     }
+
+    static async getUserStats(userId) {
+        try {
+            const stats = await UserModel.getStats(userId);
+            return { success: true, data: stats };
+        } catch (error) {
+            return { success: false, message: error.message || '获取统计失败' };
+        }
+    }
+
+    static async listAddresses(userId) {
+        try {
+            const list = await UserModel.listAddresses(userId);
+            return { success: true, data: list };
+        } catch (error) {
+            return { success: false, message: error.message || '获取地址失败' };
+        }
+    }
+
+    static async createAddress(userId, data) {
+        try {
+            const required = ['receiver_name', 'receiver_phone', 'province', 'city', 'district', 'detail_address'];
+            for (const f of required) {
+                if (!String(data[f] || '').trim()) throw new Error('收货地址信息不完整');
+            }
+            const phone = String(data.receiver_phone || '').trim();
+            if (!/^\d{5,20}$/.test(phone) && !/^1[3-9]\d{9}$/.test(phone)) {
+                throw new Error('收货电话格式不正确');
+            }
+            const res = await UserModel.createAddress(userId, data);
+            return { success: true, data: res };
+        } catch (error) {
+            return { success: false, message: error.message || '新增地址失败' };
+        }
+    }
+
+    static async updateAddress(userId, id, data) {
+        try {
+            const res = await UserModel.updateAddress(userId, id, data);
+            return { success: true, data: res };
+        } catch (error) {
+            return { success: false, message: error.message || '更新地址失败' };
+        }
+    }
+
+    static async deleteAddress(userId, id) {
+        try {
+            const res = await UserModel.deleteAddress(userId, id);
+            return { success: true, data: res };
+        } catch (error) {
+            return { success: false, message: error.message || '删除地址失败' };
+        }
+    }
 }
 
 module.exports = UserService;

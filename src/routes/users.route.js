@@ -1,6 +1,6 @@
 const express = require('express');
 const UserController = require('../controllers/users.controller');
-const {authMiddleware, optionalAuthMiddleware} = require('../middleware/auth.middleware');
+const { authMiddleware, optionalAuthMiddleware } = require('../middleware/auth.middleware');
 
 const router = express.Router();
 
@@ -162,17 +162,24 @@ router.delete('/user/search-history', authMiddleware, (req, res) => {
  * 上传头像
  * POST /api/user/avatar
  * 需要认证: 是
- * Content-Type: multipart/form-data
+ * 请求体: { dataUrl: 'data:image/png;base64,...' }
  */
-router.post('/user/avatar', authMiddleware, (req, res) => {
-    // TODO: 实现头像上传功能
-    res.status(501).json({
-        success: false,
-        code: 501,
-        message: '头像上传功能尚未实现',
-        timestamp: new Date().toISOString()
-    });
-});
+router.post('/user/avatar', authMiddleware, UserController.uploadAvatar);
+
+/**
+ * 获取用户统计
+ * GET /api/user/stats
+ * 需要认证: 是
+ */
+router.get('/user/stats', authMiddleware, UserController.getUserStats);
+
+/**
+ * 收货地址 CRUD
+ */
+router.get('/user/addresses', authMiddleware, UserController.getAddresses);
+router.post('/user/addresses', authMiddleware, UserController.addAddress);
+router.put('/user/addresses/:id', authMiddleware, UserController.updateAddress);
+router.delete('/user/addresses/:id', authMiddleware, UserController.deleteAddress);
 
 // ================================
 // 错误处理

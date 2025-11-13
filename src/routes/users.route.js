@@ -87,15 +87,7 @@ router.put('/user/password', authMiddleware, UserController.changePassword);
  * 需要认证: 是
  * 查询参数: ?page=1&limit=10
  */
-router.get('/user/favorites', authMiddleware, (req, res) => {
-    // TODO: 实现收藏列表功能
-    res.status(501).json({
-        success: false,
-        code: 501,
-        message: '收藏功能尚未实现',
-        timestamp: new Date().toISOString()
-    });
-});
+router.get('/user/favorites', authMiddleware, UserController.getFavorites);
 
 /**
  * 添加商品到收藏
@@ -103,30 +95,14 @@ router.get('/user/favorites', authMiddleware, (req, res) => {
  * 需要认证: 是
  * 请求体: { productId }
  */
-router.post('/user/favorites', authMiddleware, (req, res) => {
-    // TODO: 实现添加收藏功能
-    res.status(501).json({
-        success: false,
-        code: 501,
-        message: '收藏功能尚未实现',
-        timestamp: new Date().toISOString()
-    });
-});
+router.post('/user/favorites', authMiddleware, UserController.addFavorite);
 
 /**
  * 取消收藏
  * DELETE /api/user/favorites/:favoriteId
  * 需要认证: 是
  */
-router.delete('/user/favorites/:favoriteId', authMiddleware, (req, res) => {
-    // TODO: 实现取消收藏功能
-    res.status(501).json({
-        success: false,
-        code: 501,
-        message: '收藏功能尚未实现',
-        timestamp: new Date().toISOString()
-    });
-});
+router.delete('/user/favorites/:favoriteId', authMiddleware, UserController.removeFavorite);
 
 /**
  * 批量取消收藏
@@ -134,15 +110,7 @@ router.delete('/user/favorites/:favoriteId', authMiddleware, (req, res) => {
  * 需要认证: 是
  * 请求体: { favoriteIds: [1, 2, 3] }
  */
-router.delete('/user/favorites/batch', authMiddleware, (req, res) => {
-    // TODO: 实现批量取消收藏功能
-    res.status(501).json({
-        success: false,
-        code: 501,
-        message: '收藏功能尚未实现',
-        timestamp: new Date().toISOString()
-    });
-});
+router.delete('/user/favorites/batch', authMiddleware, UserController.batchRemoveFavorites);
 
 /**
  * 获取搜索历史

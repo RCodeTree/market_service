@@ -15,7 +15,8 @@ class ProductsModel {
                                   keyword = '',
                                   category = null,
                                   priceRange = '',
-                                  sortBy = 'default'
+                                  sortBy = 'default',
+                                  userId = null
                               }) {
         let conn = null;
         try {
@@ -75,7 +76,42 @@ class ProductsModel {
             const totalRaw = countResult.rows[0].TOTAL || countResult.rows[0].total || countResult.rows[0][0];
             const total = this.toNumber(totalRaw);
 
-            const listSql = `
+            // 针对 JOIN 的排序需要使用别名前缀，避免与收藏表字段冲突
+            const orderByJoin = (() => {
+                switch (sortBy) {
+                    case 'price_asc':
+                        return 'p.price ASC';
+                    case 'price_desc':
+                        return 'p.price DESC';
+                    case 'sales':
+                        return 'p.sales_count DESC';
+                    default:
+                        return 'p.created_at DESC';
+                }
+            })();
+
+            const listSql = userId ? `
+                SELECT p.id,
+                       p.name,
+                       p.subtitle,
+                       p.price,
+                       p.original_price,
+                       CAST(p.description AS VARCHAR(500)) AS description,
+                       p.main_image,
+                       p.sales_count,
+                       p.rating_avg,
+                       p.review_count,
+                       p.stock,
+                       p.is_hot,
+                       p.is_new,
+                       p.is_recommend,
+                       uf.id AS fav_id
+                FROM MARKET.PRODUCTS p
+                LEFT JOIN MARKET.USER_FAVORITES uf ON uf.product_id = p.id AND uf.user_id = ?
+                WHERE ${whereClauses.join(' AND ')}
+                ORDER BY ${orderByJoin} LIMIT ${pageSize}
+                OFFSET ${offset}
+            ` : `
                 SELECT id,
                        name,
                        subtitle,
@@ -96,7 +132,8 @@ class ProductsModel {
                 OFFSET ${offset}
             `;
 
-            const listResult = await conn.execute(listSql, params);
+            const execParams = userId ? [userId, ...params] : params;
+            const listResult = await conn.execute(listSql, execParams);
             const list = (listResult.rows || []).map(row => this.formatProductListRow(row));
 
             return {list, total};
@@ -111,7 +148,7 @@ class ProductsModel {
     static formatProductListRow(raw) {
         // 数组格式
         if (Array.isArray(raw)) {
-            const [id, name, subtitle, price, original_price, description, main_image, sales_count, rating_avg, review_count, stock, is_hot, is_new, is_recommend] = raw;
+            const [id, name, subtitle, price, original_price, description, main_image, sales_count, rating_avg, review_count, stock, is_hot, is_new, is_recommend, fav_id] = raw;
             return {
                 id: this.toNumber(id),
                 name,
@@ -126,7 +163,9 @@ class ProductsModel {
                 stock: this.toNumber(stock),
                 isHot: !!is_hot,
                 isNew: !!is_new,
-                isRecommend: !!is_recommend
+                isRecommend: !!is_recommend,
+                isFavorite: !!fav_id,
+                favoriteId: fav_id ? this.toNumber(fav_id) : undefined
             };
         }
         // 对象格式
@@ -144,7 +183,9 @@ class ProductsModel {
             stock: this.toNumber(raw.STOCK),
             isHot: !!raw.IS_HOT,
             isNew: !!raw.IS_NEW,
-            isRecommend: !!raw.IS_RECOMMEND
+            isRecommend: !!raw.IS_RECOMMEND,
+            isFavorite: !!raw.FAV_ID,
+            favoriteId: raw.FAV_ID ? this.toNumber(raw.FAV_ID) : undefined
         };
     }
 

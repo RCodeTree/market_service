@@ -14,7 +14,8 @@ class ProductsController {
         keyword: req.query.keyword || '',
         category: req.query.category ? Number(req.query.category) : null,
         priceRange: req.query.priceRange || '',
-        sortBy: req.query.sortBy || 'default'
+        sortBy: req.query.sortBy || 'default',
+        userId: req.user?.userId || null
       };
 
       const result = await ProductsService.getProductList(params);

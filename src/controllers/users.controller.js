@@ -209,6 +209,62 @@ class UserController {
             return error(res, 500, '服务器内部错误');
         }
     }
+
+    static async getFavorites(req, res) {
+        try {
+            const userId = req.user.userId;
+            const { page = 1, pageSize = 12, sort = 'latest' } = req.query;
+            const result = await UserService.getFavorites(userId, { page: Number(page), pageSize: Number(pageSize), sort });
+            if (result.success) {
+                return ok(res, '获取收藏成功', result.data);
+            }
+            return error(res, 400, result.message || '获取收藏失败');
+        } catch (e) {
+            return error(res, 500, '服务器内部错误');
+        }
+    }
+
+    static async addFavorite(req, res) {
+        try {
+            const userId = req.user.userId;
+            const { productId } = req.body;
+            const result = await UserService.addFavorite(userId, productId);
+            if (result.success) {
+                return ok(res, '添加收藏成功', result.data);
+            }
+            return error(res, 400, result.message || '添加收藏失败');
+        } catch (e) {
+            return error(res, 500, '服务器内部错误');
+        }
+    }
+
+    static async removeFavorite(req, res) {
+        try {
+            const userId = req.user.userId;
+            const { favoriteId } = req.params;
+            const result = await UserService.removeFavorite(userId, Number(favoriteId));
+            if (result.success) {
+                return ok(res, '移除收藏成功', result.data);
+            }
+            return error(res, 400, result.message || '移除收藏失败');
+        } catch (e) {
+            return error(res, 500, '服务器内部错误');
+        }
+    }
+
+    static async batchRemoveFavorites(req, res) {
+        try {
+            const userId = req.user.userId;
+            const { favoriteIds = [] } = req.body;
+            const result = await UserService.batchRemoveFavorites(userId, favoriteIds);
+            if (result.success) {
+                return ok(res, '批量移除收藏成功', result.data);
+            }
+            return error(res, 400, result.message || '批量移除收藏失败');
+        } catch (e) {
+            return error(res, 500, '服务器内部错误');
+        }
+    }
 }
 
 module.exports = UserController;

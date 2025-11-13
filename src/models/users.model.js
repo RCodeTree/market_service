@@ -342,7 +342,7 @@ class UserModel {
      * @param {Object} rawData - 原始数据
      * @returns {Object} 格式化后的数据
      */
-    static formatUserData(rawData) {
+  static formatUserData(rawData) {
         if (!rawData) return null;
 
         // 处理达梦数据库返回的数组格式数据
@@ -410,7 +410,131 @@ class UserModel {
             created_at: rawData.CREATED_AT,
             updated_at: rawData.UPDATED_AT
         };
+  }
+
+  static async listFavorites(userId, { page = 1, pageSize = 12, sort = 'latest' } = {}) {
+    let conn = null;
+    try {
+      const { conn: connection } = await GetDatabase();
+      conn = connection;
+
+      const offset = (page - 1) * pageSize;
+      let orderBy = 'uf.created_at DESC';
+      if (sort === 'price_asc') orderBy = 'p.price ASC';
+      else if (sort === 'price_desc') orderBy = 'p.price DESC';
+      else if (sort === 'rating') orderBy = 'p.rating_avg DESC';
+      else orderBy = 'uf.created_at DESC';
+
+      const countSql = 'SELECT COUNT(*) AS total FROM MARKET.USER_FAVORITES uf WHERE uf.user_id = ?';
+      const countRes = await conn.execute(countSql, [userId]);
+      const totalRaw = countRes.rows[0].TOTAL || countRes.rows[0][0];
+      const total = this.toNumber(totalRaw);
+
+      const listSql = `
+        SELECT uf.id AS fav_id,
+               uf.product_id,
+               uf.created_at,
+               p.name,
+               p.main_image,
+               p.price,
+               p.original_price,
+               p.rating_avg,
+               p.status
+        FROM MARKET.USER_FAVORITES uf
+        JOIN MARKET.PRODUCTS p ON p.id = uf.product_id
+        WHERE uf.user_id = ?
+        ORDER BY ${orderBy}
+        LIMIT ${pageSize}
+        OFFSET ${offset}
+      `;
+      const listRes = await conn.execute(listSql, [userId]);
+      const favorites = (listRes.rows || []).map(r => {
+        if (Array.isArray(r)) {
+          const [fav_id, product_id, created_at, name, main_image, price, original_price, rating_avg, status] = r;
+          return {
+            id: this.toNumber(fav_id),
+            productId: this.toNumber(product_id),
+            name,
+            image: main_image,
+            currentPrice: this.toNumber(price),
+            originalPrice: this.toNumber(original_price),
+            rating: this.toNumber(rating_avg),
+            status: this.toNumber(status) === 1 ? 'available' : 'discontinued',
+            createdAt: created_at
+          };
+        }
+        return {
+          id: this.toNumber(r.FAV_ID),
+          productId: this.toNumber(r.PRODUCT_ID),
+          name: r.NAME,
+          image: r.MAIN_IMAGE,
+          currentPrice: this.toNumber(r.PRICE),
+          originalPrice: this.toNumber(r.ORIGINAL_PRICE),
+          rating: this.toNumber(r.RATING_AVG),
+          status: this.toNumber(r.STATUS) === 1 ? 'available' : 'discontinued',
+          createdAt: r.CREATED_AT
+        };
+      });
+      return { favorites, total };
+    } catch (error) {
+      throw new Error('获取收藏列表失败');
+    } finally {
+      if (conn) await conn.close();
     }
+  }
+
+  static async addFavorite(userId, productId) {
+    let conn = null;
+    try {
+      const { conn: connection } = await GetDatabase();
+      conn = connection;
+      const check = await conn.execute('SELECT id FROM MARKET.USER_FAVORITES WHERE user_id = ? AND product_id = ? FETCH FIRST 1 ROWS ONLY', [userId, productId]);
+      if (check.rows && check.rows.length > 0) return { created: false };
+      const id = Date.now() + Math.floor(Math.random() * 1000);
+      await conn.execute('INSERT INTO MARKET.USER_FAVORITES (id, user_id, product_id, created_at) VALUES (?, ?, ?, CURRENT_TIMESTAMP)', [id, userId, productId]);
+      await conn.commit();
+      return { created: true, id };
+    } catch (error) {
+      if (conn) await conn.rollback();
+      throw new Error('添加收藏失败');
+    } finally {
+      if (conn) await conn.close();
+    }
+  }
+
+  static async removeFavorite(userId, favoriteId) {
+    let conn = null;
+    try {
+      const { conn: connection } = await GetDatabase();
+      conn = connection;
+      await conn.execute('DELETE FROM MARKET.USER_FAVORITES WHERE id = ? AND user_id = ?', [favoriteId, userId]);
+      await conn.commit();
+      return { deleted: true };
+    } catch (error) {
+      if (conn) await conn.rollback();
+      throw new Error('移除收藏失败');
+    } finally {
+      if (conn) await conn.close();
+    }
+  }
+
+  static async batchRemoveFavorites(userId, favoriteIds = []) {
+    let conn = null;
+    try {
+      const { conn: connection } = await GetDatabase();
+      conn = connection;
+      if (!Array.isArray(favoriteIds) || favoriteIds.length === 0) return { deleted: 0 };
+      const placeholders = favoriteIds.map(() => '?').join(',');
+      await conn.execute(`DELETE FROM MARKET.USER_FAVORITES WHERE user_id = ? AND id IN (${placeholders})`, [userId, ...favoriteIds]);
+      await conn.commit();
+      return { deleted: favoriteIds.length };
+    } catch (error) {
+      if (conn) await conn.rollback();
+      throw new Error('批量移除收藏失败');
+    } finally {
+      if (conn) await conn.close();
+    }
+  }
 }
 
 module.exports = UserModel;

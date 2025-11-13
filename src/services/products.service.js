@@ -5,8 +5,8 @@ const ProductsModel = require('../models/products.model');
  */
 class ProductsService {
     static async getProductList(params) {
-        const {page, pageSize, keyword, category, priceRange, sortBy} = params;
-        const {list, total} = await ProductsModel.listProducts({page, pageSize, keyword, category, priceRange, sortBy});
+        const {page, pageSize, keyword, category, priceRange, sortBy, userId = null} = params;
+        const {list, total} = await ProductsModel.listProducts({page, pageSize, keyword, category, priceRange, sortBy, userId});
         return {list, total, page, pageSize};
     }
 

@@ -18,7 +18,7 @@ class UserService {
      */
     static async register(userData) {
         try {
-            const {username, password, email, phone} = userData;
+            const { username, password, email, phone } = userData;
 
             // 验证必填字段
             if (!username || !password) {
@@ -66,7 +66,7 @@ class UserService {
             });
 
             // 返回用户信息（不包含密码）
-            const {password_hash: _, ...userInfo} = newUser;
+            const { password_hash: _, ...userInfo } = newUser;
 
             return {
                 success: true,
@@ -96,7 +96,7 @@ class UserService {
      */
     static async login(credentials, clientIp, userAgent) {
         try {
-            const {username, password, remember = false} = credentials;
+            const { username, password, remember = false } = credentials;
 
             // 验证必填字段
             if (!username || !password) {
@@ -200,7 +200,7 @@ class UserService {
             });
 
             // 返回登录结果（不包含密码）
-            const {password_hash, remember_token, ...userInfo} = user;
+            const { password_hash, remember_token, ...userInfo } = user;
 
             return {
                 success: true,
@@ -233,7 +233,7 @@ class UserService {
             }
 
             // 返回用户信息（不包含敏感信息）
-            const {password_hash, remember_token, ...userInfo} = user;
+            const { password_hash, remember_token, ...userInfo } = user;
 
             return {
                 success: true,
@@ -269,7 +269,7 @@ class UserService {
             const updatedUser = await UserModel.updateProfile(userId, updateData);
 
             // 返回更新后的用户信息（不包含敏感信息）
-            const {password_hash, remember_token, ...userInfo} = updatedUser;
+            const { password_hash, remember_token, ...userInfo } = updatedUser;
 
             return {
                 success: true,
@@ -379,7 +379,7 @@ class UserService {
      */
     static async changePassword(userId, passwordData) {
         try {
-            const {oldPassword, newPassword} = passwordData;
+            const { oldPassword, newPassword } = passwordData;
 
             if (!oldPassword || !newPassword) {
                 throw new Error('旧密码和新密码不能为空');
@@ -420,6 +420,42 @@ class UserService {
                 success: false,
                 message: error.message || '修改密码失败'
             };
+        }
+    }
+
+    static async getFavorites(userId, params = {}) {
+        try {
+            const { favorites, total } = await UserModel.listFavorites(userId, params);
+            return { success: true, data: { favorites, total } };
+        } catch (error) {
+            return { success: false, message: error.message || '获取收藏失败' };
+        }
+    }
+
+    static async addFavorite(userId, productId) {
+        try {
+            const res = await UserModel.addFavorite(userId, productId);
+            return { success: true, data: res };
+        } catch (error) {
+            return { success: false, message: error.message || '添加收藏失败' };
+        }
+    }
+
+    static async removeFavorite(userId, favoriteId) {
+        try {
+            const res = await UserModel.removeFavorite(userId, favoriteId);
+            return { success: true, data: res };
+        } catch (error) {
+            return { success: false, message: error.message || '移除收藏失败' };
+        }
+    }
+
+    static async batchRemoveFavorites(userId, favoriteIds = []) {
+        try {
+            const res = await UserModel.batchRemoveFavorites(userId, favoriteIds);
+            return { success: true, data: res };
+        } catch (error) {
+            return { success: false, message: error.message || '批量移除收藏失败' };
         }
     }
 }

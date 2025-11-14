@@ -106,7 +106,11 @@ class UserModel {
             const result = await conn.execute(sql, [userId]);
 
             if (result.rows && result.rows.length > 0) {
-                return this.formatUserData(result.rows[0]);
+                const row = result.rows[0];
+                if (Array.isArray(row)) {
+                    return this.formatUserDataByIdRow(row);
+                }
+                return this.formatUserData(row);
             }
 
             return null;
@@ -342,7 +346,7 @@ class UserModel {
      * @param {Object} rawData - 原始数据
      * @returns {Object} 格式化后的数据
      */
-    static formatUserData(rawData) {
+  static formatUserData(rawData) {
         if (!rawData) return null;
 
         // 处理达梦数据库返回的数组格式数据
@@ -381,7 +385,8 @@ class UserModel {
                 created_at,
                 updated_at
             };
-        }
+  }
+
 
         // 处理对象格式数据（兼容性保留）
         return {
@@ -409,6 +414,39 @@ class UserModel {
             agree_privacy: this.toNumber(rawData.AGREE_PRIVACY),
             created_at: rawData.CREATED_AT,
             updated_at: rawData.UPDATED_AT
+        };
+    }
+
+    static formatUserDataByIdRow(rawData) {
+        if (!Array.isArray(rawData)) return this.formatUserData(rawData);
+        const [
+            id, username, nickname, email, phone, avatar, gender,
+            birthday, bio, level, points, balance, status,
+            last_login_time, last_login_ip, login_count,
+            email_verified, phone_verified,
+            created_at, updated_at
+        ] = rawData;
+        return {
+            id: this.toNumber(id),
+            username,
+            nickname,
+            email,
+            phone,
+            avatar,
+            gender,
+            birthday,
+            bio,
+            level: this.toNumber(level),
+            points: this.toNumber(points),
+            balance: this.toNumber(balance),
+            status: this.toNumber(status),
+            last_login_time,
+            last_login_ip,
+            login_count: this.toNumber(login_count),
+            email_verified: this.toNumber(email_verified),
+            phone_verified: this.toNumber(phone_verified),
+            created_at,
+            updated_at
         };
     }
 

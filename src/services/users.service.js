@@ -256,17 +256,59 @@ class UserService {
      */
     static async updateProfile(userId, updateData) {
         try {
+            const mapped = { ...updateData };
+            // 统一空值处理：空字符串转为 null，避免驱动类型转换异常
+            ['nickname', 'email', 'phone', 'bio', 'avatar'].forEach((k) => {
+                if (Object.prototype.hasOwnProperty.call(mapped, k)) {
+                    const v = mapped[k];
+                    if (typeof v === 'string' && v.trim() === '') mapped[k] = null;
+                }
+            });
+            // 性别：字符串映射为数值；空值则不更新
+            if (Object.prototype.hasOwnProperty.call(mapped, 'gender')) {
+                const g = mapped.gender;
+                if (g === '' || g === null || typeof g === 'undefined') {
+                    delete mapped.gender;
+                } else if (typeof g === 'string') {
+                    const gv = g === 'male' ? 1 : g === 'female' ? 2 : 0;
+                    mapped.gender = gv;
+                }
+            }
+            // 生日：统一传 YYYY-MM-DD 字符串，空值则不更新
+            if (Object.prototype.hasOwnProperty.call(mapped, 'birthday')) {
+                const b = mapped.birthday;
+                if (!b || (typeof b === 'string' && b.trim() === '')) {
+                    delete mapped.birthday;
+                } else if (typeof b === 'string') {
+                    const d = new Date(b);
+                    if (isNaN(d.getTime())) {
+                        delete mapped.birthday;
+                    } else {
+                        const y = d.getFullYear();
+                        const m = String(d.getMonth() + 1).padStart(2, '0');
+                        const dd = String(d.getDate()).padStart(2, '0');
+                        mapped.birthday = `${y}-${m}-${dd}`;
+                    }
+                } else if (b instanceof Date) {
+                    const y = b.getFullYear();
+                    const m = String(b.getMonth() + 1).padStart(2, '0');
+                    const dd = String(b.getDate()).padStart(2, '0');
+                    mapped.birthday = `${y}-${m}-${dd}`;
+                } else {
+                    delete mapped.birthday;
+                }
+            }
             // 验证邮箱格式（如果提供）
-            if (updateData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(updateData.email)) {
+            if (Object.prototype.hasOwnProperty.call(mapped, 'email') && mapped.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mapped.email)) {
                 throw new Error('邮箱格式不正确');
             }
 
             // 验证手机号格式（如果提供）
-            if (updateData.phone && !/^1[3-9]\d{9}$/.test(updateData.phone)) {
+            if (Object.prototype.hasOwnProperty.call(mapped, 'phone') && mapped.phone && !/^1[3-9]\d{9}$/.test(mapped.phone)) {
                 throw new Error('手机号格式不正确');
             }
 
-            const updatedUser = await UserModel.updateProfile(userId, updateData);
+            const updatedUser = await UserModel.updateProfile(userId, mapped);
 
             // 返回更新后的用户信息（不包含敏感信息）
             const { password_hash, remember_token, ...userInfo } = updatedUser;

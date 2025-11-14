@@ -283,7 +283,7 @@ class UserController {
             const ext = mime.includes('png') ? 'png' : 'jpg';
             const base64 = match[3];
             const buffer = Buffer.from(base64, 'base64');
-            const uploadsDir = path.join(__dirname, 'public', 'uploads', 'avatars');
+            const uploadsDir = path.join(__dirname, '..', 'public', 'uploads', 'avatars');
             fs.mkdirSync(uploadsDir, { recursive: true });
             const filename = `${userId}_${Date.now()}.${ext}`;
             const filePath = path.join(uploadsDir, filename);

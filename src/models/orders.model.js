@@ -120,6 +120,9 @@ class OrdersModel {
         productId: this.toNumber(product_id),
         skuId: sku_id ? this.toNumber(sku_id) : null,
         product: { name: product_name, image: product_image },
+        name: product_name,
+        image: product_image,
+        specs: spec_info || '',
         specifications: spec_info ? this.safeParseSpec(spec_info) : {},
         price: this.toNumber(price),
         quantity: this.toNumber(quantity)
@@ -131,6 +134,9 @@ class OrdersModel {
       productId: this.toNumber(raw.PRODUCT_ID),
       skuId: raw.SKU_ID ? this.toNumber(raw.SKU_ID) : null,
       product: { name: raw.PRODUCT_NAME, image: raw.PRODUCT_IMAGE },
+      name: raw.PRODUCT_NAME,
+      image: raw.PRODUCT_IMAGE,
+      specs: raw.SPEC_INFO || '',
       specifications: raw.SPEC_INFO ? this.safeParseSpec(raw.SPEC_INFO) : {},
       price: this.toNumber(raw.PRICE),
       quantity: this.toNumber(raw.QUANTITY)

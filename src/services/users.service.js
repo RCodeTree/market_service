@@ -18,7 +18,7 @@ class UserService {
      */
     static async register(userData) {
         try {
-            const { username, password, email, phone } = userData;
+            const {username, password, email, phone} = userData;
 
             // 验证必填字段
             if (!username || !password) {
@@ -66,7 +66,7 @@ class UserService {
             });
 
             // 返回用户信息（不包含密码）
-            const { password_hash: _, ...userInfo } = newUser;
+            const {password_hash: _, ...userInfo} = newUser;
 
             return {
                 success: true,
@@ -96,7 +96,7 @@ class UserService {
      */
     static async login(credentials, clientIp, userAgent) {
         try {
-            const { username, password, remember = false } = credentials;
+            const {username, password, remember = false} = credentials;
 
             // 验证必填字段
             if (!username || !password) {
@@ -200,7 +200,7 @@ class UserService {
             });
 
             // 返回登录结果（不包含密码）
-            const { password_hash, remember_token, ...userInfo } = user;
+            const {password_hash, remember_token, ...userInfo} = user;
 
             return {
                 success: true,
@@ -233,7 +233,7 @@ class UserService {
             }
 
             // 返回用户信息（不包含敏感信息）
-            const { password_hash, remember_token, ...userInfo } = user;
+            const {password_hash, remember_token, ...userInfo} = user;
 
             return {
                 success: true,
@@ -256,7 +256,7 @@ class UserService {
      */
     static async updateProfile(userId, updateData) {
         try {
-            const mapped = { ...updateData };
+            const mapped = {...updateData};
             // 统一空值处理：空字符串转为 null，避免驱动类型转换异常
             ['nickname', 'email', 'phone', 'avatar'].forEach((k) => {
                 if (Object.prototype.hasOwnProperty.call(mapped, k)) {
@@ -311,7 +311,7 @@ class UserService {
             const updatedUser = await UserModel.updateProfile(userId, mapped);
 
             // 返回更新后的用户信息（不包含敏感信息）
-            const { password_hash, remember_token, ...userInfo } = updatedUser;
+            const {password_hash, remember_token, ...userInfo} = updatedUser;
 
             return {
                 success: true,
@@ -421,7 +421,7 @@ class UserService {
      */
     static async changePassword(userId, passwordData) {
         try {
-            const { oldPassword, newPassword } = passwordData;
+            const {oldPassword, newPassword} = passwordData;
 
             if (!oldPassword || !newPassword) {
                 throw new Error('旧密码和新密码不能为空');
@@ -467,55 +467,55 @@ class UserService {
 
     static async getFavorites(userId, params = {}) {
         try {
-            const { favorites, total } = await UserModel.listFavorites(userId, params);
-            return { success: true, data: { favorites, total } };
+            const {favorites, total} = await UserModel.listFavorites(userId, params);
+            return {success: true, data: {favorites, total}};
         } catch (error) {
-            return { success: false, message: error.message || '获取收藏失败' };
+            return {success: false, message: error.message || '获取收藏失败'};
         }
     }
 
     static async addFavorite(userId, productId) {
         try {
             const res = await UserModel.addFavorite(userId, productId);
-            return { success: true, data: res };
+            return {success: true, data: res};
         } catch (error) {
-            return { success: false, message: error.message || '添加收藏失败' };
+            return {success: false, message: error.message || '添加收藏失败'};
         }
     }
 
     static async removeFavorite(userId, favoriteId) {
         try {
             const res = await UserModel.removeFavorite(userId, favoriteId);
-            return { success: true, data: res };
+            return {success: true, data: res};
         } catch (error) {
-            return { success: false, message: error.message || '移除收藏失败' };
+            return {success: false, message: error.message || '移除收藏失败'};
         }
     }
 
     static async batchRemoveFavorites(userId, favoriteIds = []) {
         try {
             const res = await UserModel.batchRemoveFavorites(userId, favoriteIds);
-            return { success: true, data: res };
+            return {success: true, data: res};
         } catch (error) {
-            return { success: false, message: error.message || '批量移除收藏失败' };
+            return {success: false, message: error.message || '批量移除收藏失败'};
         }
     }
 
     static async getUserStats(userId) {
         try {
             const stats = await UserModel.getStats(userId);
-            return { success: true, data: stats };
+            return {success: true, data: stats};
         } catch (error) {
-            return { success: false, message: error.message || '获取统计失败' };
+            return {success: false, message: error.message || '获取统计失败'};
         }
     }
 
     static async listAddresses(userId) {
         try {
             const list = await UserModel.listAddresses(userId);
-            return { success: true, data: list };
+            return {success: true, data: list};
         } catch (error) {
-            return { success: false, message: error.message || '获取地址失败' };
+            return {success: false, message: error.message || '获取地址失败'};
         }
     }
 
@@ -530,18 +530,18 @@ class UserService {
                 throw new Error('收货电话格式不正确');
             }
             const res = await UserModel.createAddress(userId, data);
-            return { success: true, data: res };
+            return {success: true, data: res};
         } catch (error) {
-            return { success: false, message: error.message || '新增地址失败' };
+            return {success: false, message: error.message || '新增地址失败'};
         }
     }
 
     static async updateAddress(userId, id, data) {
         try {
             const res = await UserModel.updateAddress(userId, id, data);
-            return { success: true, data: res };
+            return {success: true, data: res};
         } catch (error) {
-            return { success: false, message: error.message || '更新地址失败' };
+            return {success: false, message: error.message || '更新地址失败'};
         }
     }
 
@@ -549,12 +549,12 @@ class UserService {
         try {
             const addr = await UserModel.getAddress(userId, id);
             if (!addr) {
-                return { success: false, message: '地址不存在或已删除' };
+                return {success: false, message: '地址不存在或已删除'};
             }
             const res = await UserModel.deleteAddress(userId, id);
-            return { success: true, data: res };
+            return {success: true, data: res};
         } catch (error) {
-            return { success: false, message: error.message || '删除地址失败' };
+            return {success: false, message: error.message || '删除地址失败'};
         }
     }
 }

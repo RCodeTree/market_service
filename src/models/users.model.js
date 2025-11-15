@@ -8,6 +8,7 @@ class UserModel {
     static toNumber(v) {
         return typeof v === 'bigint' ? Number(v) : v;
     }
+
     /**
      * 根据用户名查找用户
      * @param {string} username - 用户名
@@ -344,7 +345,7 @@ class UserModel {
      * @param {Object} rawData - 原始数据
      * @returns {Object} 格式化后的数据
      */
-  static formatUserData(rawData) {
+    static formatUserData(rawData) {
         if (!rawData) return null;
 
         // 处理达梦数据库返回的数组格式数据
@@ -382,7 +383,7 @@ class UserModel {
                 created_at,
                 updated_at
             };
-  }
+        }
 
 
         // 处理对象格式数据（兼容性保留）
@@ -464,22 +465,21 @@ class UserModel {
             const total = this.toNumber(totalRaw);
 
             const listSql = `
-        SELECT uf.id AS fav_id,
-               uf.product_id,
-               uf.created_at,
-               p.name,
-               p.main_image,
-               p.price,
-               p.original_price,
-               p.rating_avg,
-               p.status
-        FROM MARKET.USER_FAVORITES uf
-        JOIN MARKET.PRODUCTS p ON p.id = uf.product_id
-        WHERE uf.user_id = ?
-        ORDER BY ${orderBy}
-        LIMIT ${pageSize}
-        OFFSET ${offset}
-      `;
+                SELECT uf.id AS fav_id,
+                       uf.product_id,
+                       uf.created_at,
+                       p.name,
+                       p.main_image,
+                       p.price,
+                       p.original_price,
+                       p.rating_avg,
+                       p.status
+                FROM MARKET.USER_FAVORITES uf
+                         JOIN MARKET.PRODUCTS p ON p.id = uf.product_id
+                WHERE uf.user_id = ?
+                ORDER BY ${orderBy} LIMIT ${pageSize}
+                OFFSET ${offset}
+            `;
             const listRes = await conn.execute(listSql, [userId]);
             const favorites = (listRes.rows || []).map(r => {
                 if (Array.isArray(r)) {
@@ -558,7 +558,10 @@ class UserModel {
             conn = connection;
             if (!Array.isArray(favoriteIds) || favoriteIds.length === 0) return { deleted: 0 };
             const placeholders = favoriteIds.map(() => '?').join(',');
-            await conn.execute(`DELETE FROM MARKET.USER_FAVORITES WHERE user_id = ? AND id IN (${placeholders})`, [userId, ...favoriteIds]);
+            await conn.execute(`DELETE
+                                FROM MARKET.USER_FAVORITES
+                                WHERE user_id = ?
+                                  AND id IN (${placeholders})`, [userId, ...favoriteIds]);
             await conn.commit();
             return { deleted: favoriteIds.length };
         } catch (error) {
@@ -631,7 +634,24 @@ class UserModel {
         try {
             const { conn: connection } = await GetDatabase();
             conn = connection;
-            const sql = `SELECT id, user_id, receiver_name, receiver_phone, province, city, district, detail_address, postal_code, address_tag, is_default, status, created_at, updated_at FROM MARKET.USER_ADDRESSES WHERE user_id = ? AND status = 1 ORDER BY is_default DESC, updated_at DESC`;
+            const sql = `SELECT id,
+                                user_id,
+                                receiver_name,
+                                receiver_phone,
+                                province,
+                                city,
+                                district,
+                                detail_address,
+                                postal_code,
+                                address_tag,
+                                is_default,
+                                status,
+                                created_at,
+                                updated_at
+                         FROM MARKET.USER_ADDRESSES
+                         WHERE user_id = ?
+                           AND status = 1
+                         ORDER BY is_default DESC, updated_at DESC`;
             const res = await conn.execute(sql, [userId]);
             return (res.rows || []).map(r => this.mapAddressRow(r));
         } catch (error) {
@@ -647,7 +667,10 @@ class UserModel {
             const { conn: connection } = await GetDatabase();
             conn = connection;
             const id = Date.now() + Math.floor(Math.random() * 1000);
-            const sql = `INSERT INTO MARKET.USER_ADDRESSES (id, user_id, receiver_name, receiver_phone, province, city, district, detail_address, postal_code, address_tag, is_default, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`;
+            const sql = `INSERT INTO MARKET.USER_ADDRESSES (id, user_id, receiver_name, receiver_phone, province, city,
+                                                            district, detail_address, postal_code, address_tag,
+                                                            is_default, status, created_at, updated_at)
+                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`;
             const isDefault = data.is_default ? 1 : 0;
             await conn.execute(sql, [id, userId, data.receiver_name, data.receiver_phone, data.province, data.city, data.district, data.detail_address, data.postal_code || null, data.address_tag || null, isDefault]);
             if (isDefault === 1) {
@@ -678,7 +701,11 @@ class UserModel {
                 }
             }
             if (fields.length === 0) throw new Error('没有可更新的字段');
-            const sql = `UPDATE MARKET.USER_ADDRESSES SET ${fields.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?`;
+            const sql = `UPDATE MARKET.USER_ADDRESSES
+                         SET ${fields.join(', ')},
+                             updated_at = CURRENT_TIMESTAMP
+                         WHERE id = ?
+                           AND user_id = ?`;
             values.push(id, userId);
             await conn.execute(sql, values);
             if (Object.prototype.hasOwnProperty.call(data, 'is_default') && (data.is_default ? 1 : 0) === 1) {
@@ -699,13 +726,11 @@ class UserModel {
         try {
             const { conn: connection } = await GetDatabase();
             conn = connection;
-            await conn.execute('UPDATE MARKET.USER_ADDRESSES SET status = 0, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?', [id, userId]);
+            await conn.execute('DELETE FROM MARKET.USER_ADDRESSES WHERE id = ? AND user_id = ?', [id, userId]);
             await conn.commit();
-            const check = await conn.execute('SELECT status FROM MARKET.USER_ADDRESSES WHERE id = ? AND user_id = ? FETCH FIRST 1 ROWS ONLY', [id, userId]);
+            const check = await conn.execute('SELECT id FROM MARKET.USER_ADDRESSES WHERE id = ? AND user_id = ? FETCH FIRST 1 ROWS ONLY', [id, userId]);
             if (check.rows && check.rows.length > 0) {
-                const statusRaw = typeof check.rows[0].STATUS !== 'undefined' ? check.rows[0].STATUS : check.rows[0][0];
-                const status = this.toNumber(statusRaw);
-                return { deleted: status === 0 };
+                return { deleted: false };
             }
             return { deleted: true };
         } catch (error) {

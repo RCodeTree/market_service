@@ -63,7 +63,7 @@ router.get('/user/profile', authMiddleware, UserController.getProfile);
  * 更新用户信息
  * PUT /api/user/profile
  * 需要认证: 是
- * 请求体: { nickname?, email?, phone?, avatar?, gender?, birthday?, bio? }
+ * 请求体: { nickname?, email?, phone?, avatar?, gender?, birthday? }
  */
 router.put('/user/profile', authMiddleware, UserController.updateProfile);
 

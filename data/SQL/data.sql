@@ -23,7 +23,6 @@ CREATE TABLE USERS (
     avatar VARCHAR(500) COMMENT '头像URL',
     gender TINYINT DEFAULT 0 COMMENT '性别：0-未知，1-男，2-女',
     birthday DATE COMMENT '生日',
-    bio TEXT COMMENT '个人简介',
     level TINYINT DEFAULT 1 COMMENT '用户等级：1-普通，2-VIP，3-SVIP',
     points INT DEFAULT 0 COMMENT '积分',
     balance DECIMAL(10, 2) DEFAULT 0.00 COMMENT '账户余额',

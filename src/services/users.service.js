@@ -258,7 +258,7 @@ class UserService {
         try {
             const mapped = { ...updateData };
             // 统一空值处理：空字符串转为 null，避免驱动类型转换异常
-            ['nickname', 'email', 'phone', 'bio', 'avatar'].forEach((k) => {
+            ['nickname', 'email', 'phone', 'avatar'].forEach((k) => {
                 if (Object.prototype.hasOwnProperty.call(mapped, k)) {
                     const v = mapped[k];
                     if (typeof v === 'string' && v.trim() === '') mapped[k] = null;
@@ -547,6 +547,10 @@ class UserService {
 
     static async deleteAddress(userId, id) {
         try {
+            const addr = await UserModel.getAddress(userId, id);
+            if (!addr) {
+                return { success: false, message: '地址不存在或已删除' };
+            }
             const res = await UserModel.deleteAddress(userId, id);
             return { success: true, data: res };
         } catch (error) {

@@ -29,7 +29,6 @@ class UserModel {
                        avatar,
                        gender,
                        birthday,
-                       bio,
                        level,
                        points,
                        balance,
@@ -86,7 +85,6 @@ class UserModel {
                        avatar,
                        gender,
                        birthday,
-                       bio,
                        level,
                        points,
                        balance,
@@ -274,7 +272,7 @@ class UserModel {
             const { conn: connection } = await GetDatabase();
             conn = connection;
 
-            const allowedFields = ['nickname', 'email', 'phone', 'avatar', 'gender', 'birthday', 'bio'];
+            const allowedFields = ['nickname', 'email', 'phone', 'avatar', 'gender', 'birthday'];
             const updateFields = [];
             const updateValues = [];
 
@@ -354,7 +352,7 @@ class UserModel {
             // 根据findByUsername查询的字段顺序映射
             const [
                 id, username, password_hash, nickname, email, phone, avatar, gender,
-                birthday, bio, level, points, balance, status, last_login_time,
+                birthday, level, points, balance, status, last_login_time,
                 last_login_ip, login_count, remember_token, email_verified,
                 phone_verified, agree_terms, agree_privacy, created_at, updated_at
             ] = rawData;
@@ -369,7 +367,6 @@ class UserModel {
                 avatar,
                 gender,
                 birthday,
-                bio,
                 level: this.toNumber(level),
                 points: this.toNumber(points),
                 balance: this.toNumber(balance),
@@ -399,7 +396,6 @@ class UserModel {
             avatar: rawData.AVATAR,
             gender: rawData.GENDER,
             birthday: rawData.BIRTHDAY,
-            bio: rawData.BIO,
             level: this.toNumber(rawData.LEVEL),
             points: this.toNumber(rawData.POINTS),
             balance: this.toNumber(rawData.BALANCE),
@@ -421,7 +417,7 @@ class UserModel {
         if (!Array.isArray(rawData)) return this.formatUserData(rawData);
         const [
             id, username, nickname, email, phone, avatar, gender,
-            birthday, bio, level, points, balance, status,
+            birthday, level, points, balance, status,
             last_login_time, last_login_ip, login_count,
             email_verified, phone_verified,
             created_at, updated_at
@@ -435,7 +431,6 @@ class UserModel {
             avatar,
             gender,
             birthday,
-            bio,
             level: this.toNumber(level),
             points: this.toNumber(points),
             balance: this.toNumber(balance),
@@ -706,10 +701,33 @@ class UserModel {
             conn = connection;
             await conn.execute('UPDATE MARKET.USER_ADDRESSES SET status = 0, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?', [id, userId]);
             await conn.commit();
+            const check = await conn.execute('SELECT status FROM MARKET.USER_ADDRESSES WHERE id = ? AND user_id = ? FETCH FIRST 1 ROWS ONLY', [id, userId]);
+            if (check.rows && check.rows.length > 0) {
+                const statusRaw = typeof check.rows[0].STATUS !== 'undefined' ? check.rows[0].STATUS : check.rows[0][0];
+                const status = this.toNumber(statusRaw);
+                return { deleted: status === 0 };
+            }
             return { deleted: true };
         } catch (error) {
             if (conn) await conn.rollback();
             throw new Error('删除地址失败');
+        } finally {
+            if (conn) await conn.close();
+        }
+    }
+
+    static async getAddress(userId, id) {
+        let conn = null;
+        try {
+            const { conn: connection } = await GetDatabase();
+            conn = connection;
+            const res = await conn.execute('SELECT id, user_id, receiver_name, receiver_phone, province, city, district, detail_address, postal_code, address_tag, is_default, status, created_at, updated_at FROM MARKET.USER_ADDRESSES WHERE id = ? AND user_id = ? FETCH FIRST 1 ROWS ONLY', [id, userId]);
+            if (res.rows && res.rows.length > 0) {
+                return this.mapAddressRow(res.rows[0]);
+            }
+            return null;
+        } catch (error) {
+            throw new Error('查询地址失败');
         } finally {
             if (conn) await conn.close();
         }
